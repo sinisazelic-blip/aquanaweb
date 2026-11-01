@@ -115,8 +115,12 @@ export default function Footer({ currentLang }: FooterProps) {
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} JP „Aquana“ d.o.o. Banja Luka. Sva prava zadržana.</p>
-          <p className="flex items-center gap-1.5">
+          <p className="flex items-center gap-2">
             <span>JP Aquana • Grad Banja Luka</span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold text-[10px] border border-emerald-500/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Sistem aktivan
+            </span>
           </p>
         </div>
       </div>
