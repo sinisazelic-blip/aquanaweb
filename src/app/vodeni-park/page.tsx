@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
@@ -33,17 +33,21 @@ export default function VodeniParkDetailedPage() {
       />
 
       {/* Hero Header */}
-      <section className="relative bg-slate-950 text-white py-16 lg:py-24 px-4 sm:px-8 overflow-hidden">
-        <div className="absolute inset-0 opacity-40">
+      {/* Hero Header - Positioned Bottom-Left over natural darker aquatic background */}
+      <section className="relative text-white min-h-[580px] lg:min-h-[640px] pt-32 pb-12 sm:pb-16 px-4 sm:px-8 overflow-hidden flex items-end bg-sky-900">
+        {/* Full Vibrant Summer Image without Darkening */}
+        <div className="absolute inset-0">
           <img
             src="/images/vodeni-park.jpg"
             alt="Vodeni park Aquana Borik"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center brightness-105 saturate-[1.25]"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent" />
+        {/* Sunny Aquatic Sheen - Stronger in bottom-left for crisp effortless reading */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-sky-950/95 via-sky-950/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-sky-950/90 via-sky-950/20 to-transparent" />
 
-        <div className="relative max-w-7xl mx-auto space-y-6">
+        <div className="relative max-w-7xl w-full mx-auto space-y-5 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/25 border border-amber-400/35 text-amber-300 text-xs font-black uppercase tracking-wider backdrop-blur-md">
             <Sun className="w-4 h-4 text-amber-400" />
             <span>38.000 m² Ljetne oaze • Naselje Borik</span>
@@ -279,3 +283,5 @@ export default function VodeniParkDetailedPage() {
     </div>
   );
 }
+
+

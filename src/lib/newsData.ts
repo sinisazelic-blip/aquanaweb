@@ -1,4 +1,4 @@
-export interface NewsItem {
+﻿export interface NewsItem {
   id: number;
   slug: string;
   title: string;
@@ -176,7 +176,7 @@ export const allNewsArticles: NewsItem[] = [
     "title": "Međunarodni plivački miting na GOB- u",
     "date": "25.02.2022.",
     "category": "Sport i takmičenja",
-    "image": "/images/ACO_1870-1.jpg",
+    "image": "/images/GOB-20.jpg",
     "excerpt": "U subotu, 26.02.2022., na Gradskom olimpijskom bazenu će se održati 11. Međunarodni memorijalni plivački miting “Mladost Kup – Branko Mićin”.\\n\\nGOB u subotu, 2...",
     "content": "U subotu, 26.02.2022., na Gradskom olimpijskom bazenu će se održati 11. Međunarodni memorijalni plivački miting “Mladost Kup – Branko Mićin”.\\n\\nGOB u subotu, 26.02.2022., neće raditi za građanstvo/rekreativce."
   },
@@ -316,7 +316,7 @@ export const allNewsArticles: NewsItem[] = [
     "title": "Dodjela diploma za polaznike “Besplatne obuke za neplivače” (foto)",
     "date": "30.12.2021.",
     "category": "Događaji",
-    "image": "/images/ACO_1870-1.jpg",
+    "image": "/images/GOB-20.jpg",
     "excerpt": "Na Gradskom olimpijskom bazenu je u srijedu, 29.12.2021., održana manifestacija svečane dodjele diploma za sve polaznike “Besplatne obuke neplivača”, za učenike...",
     "content": "Na Gradskom olimpijskom bazenu je u srijedu, 29.12.2021., održana manifestacija svečane dodjele diploma za sve polaznike “Besplatne obuke neplivača”, za učenike banjalučkih osnovnih škola. Ovim projektom je u 2021. obuhvaćeno 300 mališana, koji su uspješno završili obuku te obogatili naš grad za 300 novih mladih plivača. Projekat „Besplatne obuke za neplivače“ je realizovan u saradnji JP Aquana i Grada Banjaluka. Obuka je bila besplatna za sve polaznike a sredstva za obuku je obezbijedio Grad Banjaluka.\\n\\nSvečanoj dodjeli je prisustvovao i Gradonačelnik Banjaluke, Gospodin Draško Stanivuković koji je svim polaznicima uručio diplome. Banjalučki osnovci su uživali u prelijepom ambijentu na Gradskom olimpijskom bazenu i nakon dodjele diploma, uz nadzor trenera/instruktora plivanja održan je i veseli trening.\\n\\n"
   },
@@ -396,7 +396,7 @@ export const allNewsArticles: NewsItem[] = [
     "title": "Međunarodni novogodišnji plivački miting na GOB- u u subotu, 25.12.2021.",
     "date": "24.12.2021.",
     "category": "Sport i takmičenja",
-    "image": "/images/ACO_1870-1.jpg",
+    "image": "/images/GOB-20.jpg",
     "excerpt": "Na Gradskom olimpijskom bazenu u Banjaluci će se, 25.12.2021., održati Međunarodni novogodišnji plivački miting, u organizaciji Plivačkog kluba “Aqua Star”.\\n\\n...",
     "content": "Na Gradskom olimpijskom bazenu u Banjaluci će se, 25.12.2021., održati Međunarodni novogodišnji plivački miting, u organizaciji Plivačkog kluba “Aqua Star”.\\n\\nGOB neće raditi za rekreativce (građanstvo) 25.12.2021."
   },
@@ -611,3 +611,4 @@ export const allNewsArticles: NewsItem[] = [
     "content": "Klikom na link preuzećete skeniran zvanični dokument u PDF formatu.\\n\\n"
   }
 ];
+

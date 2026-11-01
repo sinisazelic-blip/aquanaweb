@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { Lang } from "@/lib/translations";
@@ -17,7 +17,7 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
       handle: "@rijeka.sport1 / @aquana.ba",
       time: "Prije 2 sata",
       text: "🏊‍♂️ NOVOSTI: Od ove nedjelje termini za građanstvo su produženi! Radimo od 07:00 do 22:00h. Voda je na savršenih 26.8°C, a 5 slobodnih staza čeka rekreativce. Vidimo se na bazenu!",
-      image: "/images/ACO_1870-1.jpg",
+      image: "/images/GOB-10.jpg",
       likes: 142,
       comments: 19,
     },
@@ -162,3 +162,4 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
     </section>
   );
 }
+

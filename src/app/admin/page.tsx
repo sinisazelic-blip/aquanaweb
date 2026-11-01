@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ShieldCheck,
   UserCheck,
@@ -15,7 +15,7 @@ import {
   Eye,
   Settings,
   Calendar,
-  Image,
+  Image as ImageIcon,
   Upload,
   ArrowLeft,
   Search,
@@ -25,11 +25,27 @@ import {
   ToggleLeft,
   ToggleRight,
   TrendingUp,
-  History
+  History,
+  LogOut,
+  Users,
+  Ticket,
+  Palette,
+  Star,
+  MessageSquare,
+  Phone,
+  Filter
 } from "lucide-react";
 import Link from "next/link";
 import { allNewsArticles, NewsItem } from "@/lib/newsData";
 import { initialTenders, TenderItem } from "@/lib/tendersData";
+import {
+  getSurveys,
+  getCoupons,
+  getKidsDrawings,
+  SurveySubmission,
+  CouponClaim,
+  KidsDrawingSubmission
+} from "@/lib/submissionsData";
 
 type UserRole = "superadmin" | "webadmin" | "referent_nabavke" | "referent_pr";
 
@@ -44,20 +60,41 @@ interface CommercialBanner {
   isActive: boolean;
 }
 
-export default function AdminPortalPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>("superadmin");
-  const [activeTab, setActiveTab] = useState<"news" | "banners" | "tenders" | "pricing" | "audit">("news");
+const ROLE_CREDENTIALS: Record<string, { role: UserRole; name: string; title: string }> = {
+  superadmin: { role: "superadmin", name: "Siniša Zelić", title: "Glavni Administrator (Superadmin)" },
+  webadmin: { role: "webadmin", name: "Web Administrator", title: "Urednik web portala" },
+  nabavke: { role: "referent_nabavke", name: "Referent za javne nabavke", title: "Služba nabavki i ugovora" },
+  pr: { role: "referent_pr", name: "PR & Marketing referent", title: "Odnosi s javnošću i marketing" }
+};
 
-  // State: News
+export default function AdminPortalPage() {
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [usernameInput, setUsernameInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [currentRole, setCurrentRole] = useState<UserRole>("superadmin");
+  const [userProfile, setUserProfile] = useState({ name: "Siniša Zelić", title: "Glavni Administrator" });
+
+  // Navigation Tab State
+  const [activeTab, setActiveTab] = useState<"surveys" | "coupons" | "drawings" | "news" | "tenders" | "banners">("surveys");
+
+  // Submissions State
+  const [surveys, setSurveys] = useState<SurveySubmission[]>([]);
+  const [coupons, setCoupons] = useState<CouponClaim[]>([]);
+  const [drawings, setDrawings] = useState<KidsDrawingSubmission[]>([]);
+
+  // News State
   const [newsList, setNewsList] = useState<NewsItem[]>(allNewsArticles);
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState("Sport i takmičenja");
   const [newExcerpt, setNewExcerpt] = useState("");
-  const [newContent, setNewContent] = useState("");
   const [showAddNewsModal, setShowAddNewsModal] = useState(false);
 
-  // State: Banners & Commercial Slots
-  const [topNewsActive, setTopNewsActive] = useState(true);
+  // Tenders State
+  const [tendersList, setTendersList] = useState<TenderItem[]>(initialTenders);
+
+  // Commercial Banners State
   const [commercialBanners, setCommercialBanners] = useState<CommercialBanner[]>([
     {
       id: 1,
@@ -78,252 +115,631 @@ export default function AdminPortalPage() {
       validFrom: "15.10.2026.",
       validTo: "30.11.2026.",
       isActive: true,
-    },
-    {
-      id: 3,
-      client: "Sportska oprema Speedo Banja Luka",
-      position: "sidebar",
-      image: "/images/ACO_1870-1.jpg",
-      link: "https://aquana.ba",
-      validFrom: "01.06.2026.",
-      validTo: "31.08.2026.",
-      isActive: false, // Expired / Inactive
-    },
+    }
   ]);
 
-  // State: Tenders
-  const [tenders, setTenders] = useState<TenderItem[]>(initialTenders);
-  const [newTenderTitle, setNewTenderTitle] = useState("");
-  const [newTenderStatus, setNewTenderStatus] = useState<any>("Dodijeljen ugovor");
-  const [showAddTenderModal, setShowAddTenderModal] = useState(false);
+  // Load session & submissions on mount
+  useEffect(() => {
+    try {
+      const savedSession = localStorage.getItem("aquana_admin_auth");
+      if (savedSession) {
+        const parsed = JSON.parse(savedSession);
+        setIsAuthenticated(true);
+        setCurrentRole(parsed.role || "superadmin");
+        setUserProfile(parsed.profile || { name: "Siniša Zelić", title: "Glavni Administrator" });
+      }
+    } catch {
+      // ignore
+    }
+    setSurveys(getSurveys());
+    setCoupons(getCoupons());
+    setDrawings(getKidsDrawings());
+  }, []);
 
-  // Audit Log State
-  const [auditLogs, setAuditLogs] = useState([
-    { id: 1, time: "Danas, 06:14h", user: "Zamjenik direktora (Superadmin)", action: "Odobrena i objavljena vijest: 'Zimski režim na GOB-u'" },
-    { id: 2, time: "Juče, 14:30h", user: "Referent javnih nabavki", action: "Unesena nova 'Odluka o nabavci hemikalija za vodu' (Zahtijeva odobrenje)" },
-    { id: 3, time: "30.10.2026.", user: "Web Administrator", action: "Ažuriran sanitarni nalaz Instituta za javno zdravstvo RS" },
-    { id: 4, time: "28.10.2026.", user: "PR Referent", action: "Kreiran nacrt za 'Plivaj srcem 2026 miting'" },
-  ]);
-
-  // Helper: Role Badges
-  const roleLabels = {
-    superadmin: { title: "Superadmin (Zamjenik direktora / Uprava)", badge: "bg-purple-100 text-purple-900 border-purple-300", desc: "Puna kontrola, odobravanje zakonskih objava, upravljanje banerima i finansijskim prostorom." },
-    webadmin: { title: "Web Administrator (IT Sektor)", badge: "bg-blue-100 text-blue-900 border-blue-300", desc: "Tehnička administracija, Cloudflare tunel, struktura stranica i anketni formulari." },
-    referent_nabavke: { title: "Referent za javne nabavke", badge: "bg-amber-100 text-amber-900 border-amber-300", desc: "Ograničen pristup: Može samo unositi tenderska akta i PDF dokumente (nema pristup vijestima ni dizajnu)." },
-    referent_pr: { title: "PR / Marketing Referent", badge: "bg-emerald-100 text-emerald-900 border-emerald-300", desc: "Ograničen pristup: Priprema vijesti i saopštenja u status 'Nacrt' (čeka odobrenje Superadmina prije objave)." }
-  };
-
-  // Add News Handler
-  const handleCreateNews = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
+    setLoginError("");
 
-    const newItem: NewsItem = {
-      id: Date.now(),
-      slug: newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      title: newTitle,
-      date: new Date().toLocaleDateString("sr-BA") + ".",
-      category: newCategory,
-      image: "/images/GOB-1.jpg",
-      excerpt: newExcerpt || newTitle,
-      content: newContent || newTitle,
+    const u = usernameInput.trim().toLowerCase();
+    const p = passwordInput.trim();
+
+    if (u === "superadmin" && (p === "aquana2026!" || p === "admin")) {
+      completeLogin("superadmin");
+    } else if (u === "webadmin" && (p === "web2026!" || p === "web")) {
+      completeLogin("webadmin");
+    } else if (u === "nabavke" && (p === "tender2026!" || p === "nabavke")) {
+      completeLogin("nabavke");
+    } else if (u === "pr" && (p === "marketing2026!" || p === "pr")) {
+      completeLogin("pr");
+    } else {
+      setLoginError("Neispravno korisničko ime ili lozinka. Pokušajte ponovo.");
+    }
+  };
+
+  const completeLogin = (roleKey: string) => {
+    const cred = ROLE_CREDENTIALS[roleKey];
+    setIsAuthenticated(true);
+    setCurrentRole(cred.role);
+    setUserProfile({ name: cred.name, title: cred.title });
+    try {
+      localStorage.setItem("aquana_admin_auth", JSON.stringify({ role: cred.role, profile: { name: cred.name, title: cred.title } }));
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    try {
+      localStorage.removeItem("aquana_admin_auth");
+    } catch {
+      // ignore
+    }
+  };
+
+  // Quick switch role helper for superadmin testing
+  const switchRole = (role: UserRole) => {
+    setCurrentRole(role);
+    const key = role === "superadmin" ? "superadmin" : role === "webadmin" ? "webadmin" : role === "referent_nabavke" ? "nabavke" : "pr";
+    setUserProfile({ name: ROLE_CREDENTIALS[key].name, title: ROLE_CREDENTIALS[key].title });
+  };
+
+  // Coupon toggle status
+  const toggleCouponStatus = (id: string) => {
+    const updated = coupons.map((c) =>
+      c.id === id ? { ...c, status: (c.status === "Aktivan" ? "Iskorišten" : "Aktivan") as "Aktivan" | "Iskorišten" } : c
+    );
+    setCoupons(updated);
+    try {
+      localStorage.setItem("aquana_coupons", JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
+  // Calculate survey averages
+  const surveyStats = React.useMemo(() => {
+    if (surveys.length === 0) return { avg: 4.8, cistoca: 4.8, voda: 4.9, temp: 4.7, osoblje: 4.6, count: 0 };
+    const total = surveys.reduce((acc, s) => {
+      acc.cistoca += s.ratings.cistoca;
+      acc.voda += s.ratings.kvalitetVode;
+      acc.temp += s.ratings.temperatura;
+      acc.osoblje += s.ratings.osoblje;
+      return acc;
+    }, { cistoca: 0, voda: 0, temp: 0, osoblje: 0 });
+
+    const count = surveys.length;
+    const avg = ((total.cistoca + total.voda + total.temp + total.osoblje) / (count * 4)).toFixed(1);
+    return {
+      avg,
+      cistoca: (total.cistoca / count).toFixed(1),
+      voda: (total.voda / count).toFixed(1),
+      temp: (total.temp / count).toFixed(1),
+      osoblje: (total.osoblje / count).toFixed(1),
+      count
     };
+  }, [surveys]);
 
-    setNewsList([newItem, ...newsList]);
-    setAuditLogs([
-      { id: Date.now(), time: "Upravo", user: roleLabels[currentRole].title.split(" (")[0], action: `Kreirana vijest: '${newTitle}'` },
-      ...auditLogs
-    ]);
-    setShowAddNewsModal(false);
-    setNewTitle("");
-    setNewExcerpt("");
-    setNewContent("");
-  };
+  // LOGIN SCREEN
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
+        {/* Ambient background glows */}
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-600/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
 
-  // Toggle Banner Active
-  const handleToggleBanner = (id: number) => {
-    setCommercialBanners(commercialBanners.map(b => b.id === id ? { ...b, isActive: !b.isActive } : b));
-  };
+        <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border border-slate-200 relative z-10">
+          <div className="text-center space-y-2 mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-cyan-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-sky-600/30">
+              <Lock className="w-8 h-8" />
+            </div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+              Aquana CMS Portal
+            </h1>
+            <p className="text-xs text-slate-500">
+              Autentifikovani pristup za upravu, administratore i referente JP „Aquana“ Banja Luka.
+            </p>
+          </div>
 
-  // Can perform actions?
-  const canManageBanners = currentRole === "superadmin" || currentRole === "webadmin";
-  const canManageTenders = currentRole === "superadmin" || currentRole === "referent_nabavke";
-  const canManageNews = currentRole === "superadmin" || currentRole === "webadmin" || currentRole === "referent_pr";
+          {loginError && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{loginError}</span>
+            </div>
+          )}
 
-  return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 font-sans flex flex-col">
-      {/* Top Admin Control Bar */}
-      <header className="bg-slate-950 text-white border-b-4 border-sky-600 shadow-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition flex items-center gap-2 text-xs font-bold uppercase tracking-wider"
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                Korisničko ime:
+              </label>
+              <input
+                type="text"
+                required
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
+                placeholder="superadmin / webadmin / nabavke / pr"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                Lozinka:
+              </label>
+              <input
+                type="password"
+                required
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-sky-600/30 transition hover:scale-[1.01]"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Javni Portal</span>
-            </Link>
+              Prijavi se na sistem
+            </button>
+          </form>
 
-            <div className="border-l border-slate-800 pl-4">
-              <h1 className="text-xl font-black text-white flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-sky-400" />
-                <span>JP AQUANA — Centralni Upravljački CMS</span>
-              </h1>
-              <p className="text-[11px] text-slate-400">
-                Strogo kontrolisano uređivanje bez mogućnosti kvarenja dizajna i koda
-              </p>
+          {/* Quick-Role Testing Shortcuts for Siniša */}
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+            <span className="text-[10px] uppercase font-black text-slate-400 block mb-2">
+              Brza prijava po ulogama (testni pristup):
+            </span>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => completeLogin("superadmin")}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
+              >
+                ★ Superadmin
+                <span className="block text-[10px] text-slate-400 font-normal">Siniša Zelić</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => completeLogin("webadmin")}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
+              >
+                ● Webadmin
+                <span className="block text-[10px] text-slate-400 font-normal">Sadržaj & vijesti</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => completeLogin("nabavke")}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
+              >
+                ◆ Javne nabavke
+                <span className="block text-[10px] text-slate-400 font-normal">Tenderi & akti</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => completeLogin("pr")}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
+              >
+                ▲ PR Referent
+                <span className="block text-[10px] text-slate-400 font-normal">Marketing & kuponi</span>
+              </button>
             </div>
           </div>
 
-          {/* Role Simulator Switcher */}
-          <div className="flex items-center gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
-            <span className="text-[11px] text-slate-400 font-bold px-2 uppercase">Aktivna Uloga:</span>
-            <select
-              value={currentRole}
-              onChange={(e) => setCurrentRole(e.target.value as UserRole)}
-              className="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
-            >
-              <option value="superadmin">👑 Superadmin (Uprava / Zamjenik direktora)</option>
-              <option value="webadmin">💻 Web Administrator (IT Sektor)</option>
-              <option value="referent_nabavke">⚖️ Referent za javne nabavke</option>
-              <option value="referent_pr">📢 PR / Marketing Referent</option>
-            </select>
+          <div className="mt-5 text-center">
+            <Link href="/" className="text-xs text-sky-600 hover:text-sky-800 font-bold flex items-center justify-center gap-1">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Povratak na javni sajt</span>
+            </Link>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // AUTHENTICATED ADMIN DASHBOARD
+  return (
+    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans">
+      {/* Top Header */}
+      <header className="bg-slate-900 text-white px-6 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 shadow-lg">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2 group">
+            <img src="/firma/logo-light.png" alt="Aquana" className="h-6 w-auto object-contain" />
+            <span className="text-xs font-black bg-sky-600 px-2 py-0.5 rounded text-white tracking-widest uppercase">CMS</span>
+          </Link>
+          <span className="hidden sm:inline text-slate-600">|</span>
+          <span className="text-xs font-bold text-slate-300">JP „Aquana“ d.o.o. Banja Luka</span>
+        </div>
+
+        {/* User profile & Role switcher */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs border border-sky-500/40">
+              {userProfile.name.slice(0, 2).toUpperCase()}
+            </div>
+            <div className="hidden md:block text-left text-xs">
+              <strong className="block text-white leading-tight">{userProfile.name}</strong>
+              <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider text-sky-400">
+                {currentRole}
+              </span>
+            </div>
+          </div>
+
+          {/* Superadmin Role Test Switcher */}
+          <div className="hidden lg:flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
+            <span className="text-[10px] text-slate-400 font-bold px-2">Uloga:</span>
+            {(["superadmin", "webadmin", "referent_nabavke", "referent_pr"] as UserRole[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => switchRole(r)}
+                className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase transition ${
+                  currentRole === r ? "bg-sky-600 text-white shadow-sm" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                {r === "superadmin" ? "Super" : r === "webadmin" ? "Web" : r === "referent_nabavke" ? "Nabavke" : "PR"}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 border border-slate-700 transition"
+            title="Odjavi se"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
 
-      {/* Role Context Bar */}
-      <div className="w-full bg-slate-200/90 border-b border-slate-300 py-2.5 px-4 sm:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-0.5 rounded-md font-black border text-[11px] ${roleLabels[currentRole].badge}`}>
-              {roleLabels[currentRole].title}
-            </span>
-            <span className="text-slate-600 hidden md:inline">{roleLabels[currentRole].desc}</span>
-          </div>
-          <span className="text-slate-500 font-mono text-[11px]">Sistem: EnterSYS Cloudflare Isolated Tunnel</span>
-        </div>
-      </div>
-
-      {/* Main Admin Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 space-y-6">
-        {/* Navigation Tabs */}
-        <div className="flex border-b border-slate-300 gap-2 overflow-x-auto pb-1">
+      {/* Main Tabs Navigation */}
+      <div className="bg-white border-b border-slate-200 px-6 overflow-x-auto shadow-sm">
+        <div className="flex items-center gap-2 min-w-max py-2">
           <button
-            onClick={() => setActiveTab("news")}
-            disabled={!canManageNews}
-            className={`px-5 py-3 rounded-t-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
-              activeTab === "news"
-                ? "bg-white text-sky-700 border-t-2 border-sky-600 shadow-sm"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={() => setActiveTab("surveys")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "surveys"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            <Newspaper className="w-4 h-4" />
-            <span>Vijesti i Saopštenja</span>
-            <span className="px-1.5 py-0.5 bg-slate-200 rounded-full text-[10px]">{newsList.length}</span>
+            <Star className="w-4 h-4 text-amber-300" />
+            <span>Anketa građana ({surveys.length})</span>
           </button>
 
           <button
-            onClick={() => setActiveTab("banners")}
-            disabled={!canManageBanners}
-            className={`px-5 py-3 rounded-t-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
-              activeTab === "banners"
-                ? "bg-white text-amber-700 border-t-2 border-amber-500 shadow-sm"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={() => setActiveTab("coupons")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "coupons"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            <Layers className="w-4 h-4" />
-            <span>Baneri i Komercijalni prostor</span>
-            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded-full text-[10px]">3 aktivna</span>
+            <Ticket className="w-4 h-4 text-amber-400" />
+            <span>Flash Kuponi ({coupons.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("drawings")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "drawings"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            }`}
+          >
+            <Palette className="w-4 h-4 text-purple-400" />
+            <span>Dječiji konkurs ({drawings.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("news")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "news"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            }`}
+          >
+            <Newspaper className="w-4 h-4 text-sky-400" />
+            <span>Vijesti & Obavještenja ({newsList.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab("tenders")}
-            disabled={!canManageTenders}
-            className={`px-5 py-3 rounded-t-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
               activeTab === "tenders"
-                ? "bg-white text-emerald-700 border-t-2 border-emerald-600 shadow-sm"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Javne nabavke (Tenderi)</span>
-            <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-[10px]">{tenders.length}</span>
+            <FileText className="w-4 h-4 text-emerald-400" />
+            <span>Javne nabavke ({tendersList.length})</span>
           </button>
 
           <button
-            onClick={() => setActiveTab("audit")}
-            className={`px-5 py-3 rounded-t-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
-              activeTab === "audit"
-                ? "bg-white text-purple-700 border-t-2 border-purple-600 shadow-sm"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+            onClick={() => setActiveTab("banners")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "banners"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            <History className="w-4 h-4" />
-            <span>Revizijski Dnevnik (Ko je šta radio)</span>
+            <ImageIcon className="w-4 h-4 text-indigo-400" />
+            <span>Komercijalni baneri</span>
           </button>
         </div>
+      </div>
 
-        {/* TAB 1: VIJESTI & SAOPŠTENJA */}
-        {activeTab === "news" && (
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-300 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-              <div>
-                <h2 className="text-xl font-black text-slate-900">Uređivanje vijesti i članaka</h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Unos novih članaka za sajt, školu plivanja i sportske manifestacije. Formatiranje je zaključano tako da se dizajn nikada ne može pokvariti.
-                </p>
+      {/* Main Dashboard Content Area */}
+      <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+        {/* TAB 1: SURVEY ANALYTICS */}
+        {activeTab === "surveys" && (
+          <div className="space-y-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Ukupna ocjena</span>
+                <div className="text-3xl font-black text-amber-500 mt-1 flex items-center gap-1">
+                  <span>{surveyStats.avg}</span>
+                  <Star className="w-6 h-6 fill-amber-400" />
+                </div>
+                <span className="text-[11px] text-slate-500 font-medium">od maksimalnih 5.0</span>
               </div>
 
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Čistoća prostora</span>
+                <div className="text-2xl font-black text-slate-900 mt-1">{surveyStats.cistoca} / 5.0</div>
+                <span className="text-[11px] text-emerald-600 font-bold">Odlično ocijenjeno</span>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Kvalitet vode</span>
+                <div className="text-2xl font-black text-slate-900 mt-1">{surveyStats.voda} / 5.0</div>
+                <span className="text-[11px] text-cyan-600 font-bold">FINA bistrina</span>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Temperatura (26.8°C)</span>
+                <div className="text-2xl font-black text-slate-900 mt-1">{surveyStats.temp} / 5.0</div>
+                <span className="text-[11px] text-slate-500 font-medium">Optimalno grijanje</span>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Ljubaznost osoblja</span>
+                <div className="text-2xl font-black text-slate-900 mt-1">{surveyStats.osoblje} / 5.0</div>
+                <span className="text-[11px] text-slate-500 font-medium">Recepcija & treneri</span>
+              </div>
+            </div>
+
+            {/* Surveys Submissions Table */}
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Zabilježeni odgovori građana i posjetilaca</h3>
+                  <p className="text-xs text-slate-500">Direktni komentari i ocjene pristigle putem ankete na web portalu</p>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-200">
+                  {surveys.length} zabilježenih anketa
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                      <th className="py-3 px-4">Datum & ID</th>
+                      <th className="py-3 px-4">Učestalost</th>
+                      <th className="py-3 px-4">Ocjene (Čist/Voda/Temp/Osoblje)</th>
+                      <th className="py-3 px-4">Komentar / Sugestija građana</th>
+                      <th className="py-3 px-4">Kontakt</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {surveys.map((s) => (
+                      <tr key={s.id} className="hover:bg-slate-50 transition">
+                        <td className="py-3 px-4 font-mono">
+                          <strong className="text-slate-900 block">{s.id}</strong>
+                          <span className="text-[10px] text-slate-400">{s.date}</span>
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-slate-700">{s.frequency}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-1 font-bold text-slate-900">
+                            <span className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded text-[11px]">Č: {s.ratings.cistoca}★</span>
+                            <span className="bg-sky-100 text-sky-900 px-1.5 py-0.5 rounded text-[11px]">V: {s.ratings.kvalitetVode}★</span>
+                            <span className="bg-emerald-100 text-emerald-900 px-1.5 py-0.5 rounded text-[11px]">T: {s.ratings.temperatura}★</span>
+                            <span className="bg-purple-100 text-purple-900 px-1.5 py-0.5 rounded text-[11px]">O: {s.ratings.osoblje}★</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 max-w-md text-slate-600 leading-relaxed font-medium">
+                          „{s.comment}“
+                        </td>
+                        <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">
+                          {s.contact || "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: FLASH COUPONS */}
+        {activeTab === "coupons" && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Evidencija rezervisanih flash kupona (50 ulazaka + 5 kafa)</h3>
+                  <p className="text-xs text-slate-500">Kupci koji su preuzeli digitalni vaučer i brojevi telefona evidentirani na biletarnici</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                    Aktivni kuponi: {coupons.filter(c => c.status === "Aktivan").length}
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
+                    Ukupno: {coupons.length}
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                      <th className="py-3 px-4">Kôd vaučera</th>
+                      <th className="py-3 px-4">Broj telefona</th>
+                      <th className="py-3 px-4">Datum & Vrijeme</th>
+                      <th className="py-3 px-4">Objekat</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4 text-right">Akcija</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {coupons.map((c) => (
+                      <tr key={c.id} className="hover:bg-slate-50 transition">
+                        <td className="py-3 px-4 font-mono font-black text-slate-900 text-sm">
+                          {c.code}
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-sky-800">
+                          {c.phone}
+                        </td>
+                        <td className="py-3 px-4 text-slate-500 font-medium">
+                          {c.date}
+                        </td>
+                        <td className="py-3 px-4 text-slate-700 font-semibold">
+                          {c.facility}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+                            c.status === "Aktivan"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                              : "bg-slate-200 text-slate-700"
+                          }`}>
+                            {c.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            onClick={() => toggleCouponStatus(c.id)}
+                            className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold transition"
+                          >
+                            Označi kao {c.status === "Aktivan" ? "Iskorišten" : "Aktivan"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: KIDS DRAWINGS CONTEST */}
+        {activeTab === "drawings" && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Prijave za dječiji konkurs „Nacrtaj Aquanu ili GOB“</h3>
+                  <p className="text-xs text-slate-500">Radovi pristigli za mjesečnu nagradu od 10 besplatnih ulaza</p>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
+                  {drawings.length} pristiglih radova
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                      <th className="py-3 px-4">Autor & Uzrast</th>
+                      <th className="py-3 px-4">Naziv crteža</th>
+                      <th className="py-3 px-4">Telefon roditelja</th>
+                      <th className="py-3 px-4">Datum prijave</th>
+                      <th className="py-3 px-4">Glasovi</th>
+                      <th className="py-3 px-4">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {drawings.map((d) => (
+                      <tr key={d.id} className="hover:bg-slate-50 transition">
+                        <td className="py-3 px-4 font-bold text-slate-900">
+                          🎨 {d.childName} ({d.age} god)
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-slate-700">
+                          „{d.title}“
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-sky-800">
+                          {d.parentPhone}
+                        </td>
+                        <td className="py-3 px-4 text-slate-500">
+                          {d.date}
+                        </td>
+                        <td className="py-3 px-4 font-black text-amber-600">
+                          ★ {d.votes} glasova
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                            {d.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: NEWS */}
+        {activeTab === "news" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Upravljanje vijestima i saopštenjima</h3>
+                <p className="text-xs text-slate-500">Objave na naslovnoj strani i u arhivi vijesti</p>
+              </div>
               <button
                 onClick={() => setShowAddNewsModal(true)}
-                className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase tracking-wide transition shadow-md flex items-center gap-2 self-start sm:self-auto"
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md"
               >
                 <Plus className="w-4 h-4" />
-                <span>Nova vijest</span>
+                <span>Dodaj novu vijest</span>
               </button>
             </div>
 
-            {/* News Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase">
-                    <th className="py-3 px-4 w-16">ID</th>
+                  <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
                     <th className="py-3 px-4">Naslov vijesti</th>
-                    <th className="py-3 px-4 w-40">Kategorija</th>
-                    <th className="py-3 px-4 w-32">Datum</th>
-                    <th className="py-3 px-4 w-32">Status</th>
-                    <th className="py-3 px-4 w-32 text-right">Akcija</th>
+                    <th className="py-3 px-4">Kategorija</th>
+                    <th className="py-3 px-4">Datum</th>
+                    <th className="py-3 px-4 text-right">Akcija</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {newsList.slice(0, 8).map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-slate-50 transition">
-                      <td className="py-3.5 px-4 text-xs font-mono text-slate-400">#{idx + 1}</td>
-                      <td className="py-3.5 px-4 font-semibold text-slate-900">
-                        {item.title}
+                <tbody className="divide-y divide-slate-100">
+                  {newsList.slice(0, 10).map((n) => (
+                    <tr key={n.id} className="hover:bg-slate-50 transition">
+                      <td className="py-3 px-4 font-bold text-slate-900 max-w-md truncate">
+                        {n.title}
                       </td>
-                      <td className="py-3.5 px-4">
-                        <span className="px-2.5 py-1 rounded-md bg-sky-50 text-sky-800 text-xs font-bold border border-sky-200">
-                          {item.category}
-                        </span>
+                      <td className="py-3 px-4 text-slate-600 font-medium">
+                        {n.category}
                       </td>
-                      <td className="py-3.5 px-4 text-xs text-slate-600 font-medium">{item.date}</td>
-                      <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Objavljeno</span>
-                        </span>
+                      <td className="py-3 px-4 text-slate-500 font-mono">
+                        {n.date}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3 px-4 text-right">
                         <Link
-                          href={`/vijesti/${item.id}`}
+                          href={`/vijesti/${n.id}`}
                           target="_blank"
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-sky-600 hover:bg-sky-50 inline-flex transition"
-                          title="Pregledaj na sajtu"
+                          className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold inline-flex items-center gap-1"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Pregledaj</span>
                         </Link>
                       </td>
                     </tr>
@@ -334,164 +750,40 @@ export default function AdminPortalPage() {
           </div>
         )}
 
-        {/* TAB 2: BANERI & KOMERCIJALNI PROSTOR */}
-        {activeTab === "banners" && (
-          <div className="space-y-6">
-            {/* Spotlight Banner Toggle */}
-            <div className="bg-white rounded-3xl p-6 border border-slate-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <span className="text-[11px] font-black text-amber-600 uppercase tracking-widest block">
-                  HITNA OBAVJEŠTENJA
-                </span>
-                <h3 className="text-lg font-black text-slate-900 mt-0.5">
-                  Top News / Vanredna kartica na naslovnoj strani
-                </h3>
-                <p className="text-xs text-slate-600 max-w-2xl">
-                  Istaknuta tamna kartica ispod trake za obuku. Koristi se za najave remonta, promjenu termina ili hitna obavještenja.
-                </p>
-              </div>
-
-              <button
-                onClick={() => setTopNewsActive(!topNewsActive)}
-                className={`px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition shadow-sm ${
-                  topNewsActive
-                    ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                    : "bg-slate-200 text-slate-700 hover:bg-slate-300"
-                }`}
-              >
-                {topNewsActive ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>AKTIVNO NA SAJTU</span>
-                  </>
-                ) : (
-                  <>
-                    <Clock className="w-4 h-4" />
-                    <span>PASIVNO (ISKLJUČENO)</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Commercial Banners (Prodat prostor zakupcima) */}
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-300 shadow-sm space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-                <div>
-                  <h3 className="text-xl font-black text-slate-900">
-                    Komercijalni baneri i sponzorski prostor
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Definisanje zakupljenog oglasnog prostora. Sistem sam isključuje banere čim istekne ugovoreni datum zakupa.
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => alert("Otvara se forma za upload banera i unos klijenta")}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Dodaj novi oglas</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {commercialBanners.map((banner) => (
-                  <div
-                    key={banner.id}
-                    className={`rounded-2xl border p-5 space-y-4 transition ${
-                      banner.isActive
-                        ? "bg-white border-slate-300 shadow-sm"
-                        : "bg-slate-50 border-slate-200 opacity-60"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase">
-                        {banner.position === "inter_section" ? "Međusekcijski prostor" : banner.position === "top_bar" ? "Top-bar traka" : "Bočna kolona"}
-                      </span>
-                      <button
-                        onClick={() => handleToggleBanner(banner.id)}
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider transition ${
-                          banner.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-700"
-                        }`}
-                      >
-                        {banner.isActive ? "Aktivno" : "Pasivno"}
-                      </button>
-                    </div>
-
-                    <div className="h-28 rounded-xl overflow-hidden bg-slate-100 relative">
-                      <img src={banner.image} alt={banner.client} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent flex items-end p-2.5">
-                        <span className="text-xs font-bold text-white truncate">{banner.client}</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1 text-xs text-slate-600">
-                      <p><strong>Ugovor važi od:</strong> {banner.validFrom}</p>
-                      <p><strong>Ugovor važi do:</strong> {banner.validTo}</p>
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <span className="text-slate-400 font-mono">ID: #{banner.id}</span>
-                      <button
-                        onClick={() => handleToggleBanner(banner.id)}
-                        className="text-xs font-bold text-sky-700 hover:text-sky-900"
-                      >
-                        {banner.isActive ? "Isključi oglas" : "Uključi oglas"}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: JAVNE NABAVKE */}
+        {/* TAB 5: TENDERS */}
         {activeTab === "tenders" && (
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-300 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-black text-slate-900">
-                  Registar javnih nabavki (Zakonska obaveza)
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Referent za nabavke ovdje unosi odluke o izboru, ugovore i tendersku dokumentaciju. Sve se automatski objavljuje na stranici /javne-nabavke.
-                </p>
+                <h3 className="text-lg font-black text-slate-900">Javne nabavke i tenderska dokumentacija</h3>
+                <p className="text-xs text-slate-500">Zvanični registar tendera JP „Aquana“ d.o.o. Banja Luka</p>
               </div>
-
-              <button
-                onClick={() => alert("Forma za upload PDF tenderske odluke")}
-                className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Novi tender / odluka</span>
-              </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase">
-                    <th className="py-3 px-4 w-16">R.br</th>
+                  <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                    <th className="py-3 px-4">Broj nabavke</th>
                     <th className="py-3 px-4">Predmet nabavke</th>
-                    <th className="py-3 px-4 w-32">Datum</th>
-                    <th className="py-3 px-4 w-40">Status</th>
-                    <th className="py-3 px-4 w-32 text-right">PDF Fajl</th>
+                    <th className="py-3 px-4">Godina</th>
+                    <th className="py-3 px-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {tenders.slice(0, 8).map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-slate-50 transition">
-                      <td className="py-3 px-4 text-xs font-mono text-slate-400">#{idx + 1}</td>
-                      <td className="py-3 px-4 font-semibold text-slate-900">{item.title}</td>
-                      <td className="py-3 px-4 text-xs text-slate-600">{item.date}</td>
+                <tbody className="divide-y divide-slate-100">
+                  {tendersList.map((t) => (
+                    <tr key={t.id} className="hover:bg-slate-50 transition">
+                      <td className="py-3 px-4 font-mono font-bold text-slate-900">JN-{t.id}</td>
+                      <td className="py-3 px-4 font-semibold text-slate-800">{t.title}</td>
+                      <td className="py-3 px-4 font-mono text-slate-500">{t.year}</td>
                       <td className="py-3 px-4">
-                        <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-slate-100 border border-slate-200">
-                          {item.status}
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          t.status === "Aktivno"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-slate-200 text-slate-700"
+                        }`}>
+                          {t.status}
                         </span>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <span className="text-xs text-sky-700 font-bold">PDF priložen</span>
                       </td>
                     </tr>
                   ))}
@@ -501,116 +793,37 @@ export default function AdminPortalPage() {
           </div>
         )}
 
-        {/* TAB 4: AUDIT LOG (KONTROLA & REVIZIJA) */}
-        {activeTab === "audit" && (
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-300 shadow-sm space-y-6">
+        {/* TAB 6: BANNERS */}
+        {activeTab === "banners" && (
+          <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                <History className="w-5 h-5 text-purple-600" />
-                <span>Revizijski dnevnik aktivnosti (Audit Log)</span>
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Tačna evidencija o tome koji je zaposleni i u kojoj ulozi unio, izmijenio ili objavio bilo koji podatak na portalu.
-              </p>
+              <h3 className="text-lg font-black text-slate-900">Komercijalni baneri i sponzorski slotovi</h3>
+              <p className="text-xs text-slate-500">Upravljanje zakupljenim oglasnim prostorom na portalu</p>
             </div>
 
-            <div className="space-y-3">
-              {auditLogs.map((log) => (
-                <div key={log.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <p className="font-semibold text-slate-900 text-sm">{log.action}</p>
-                    <p className="text-xs text-slate-500">
-                      Izvršilac: <strong className="text-slate-800">{log.user}</strong>
-                    </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {commercialBanners.map((b) => (
+                <div key={b.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-slate-900 text-sm">{b.client}</strong>
+                    <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">
+                      Aktivan
+                    </span>
                   </div>
-                  <span className="text-xs font-mono text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200 shrink-0">
-                    {log.time}
-                  </span>
+                  <div className="h-28 rounded-xl overflow-hidden bg-slate-100">
+                    <img src={b.image} alt={b.client} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="text-xs text-slate-500 flex justify-between font-mono">
+                    <span>Pozicija: {b.position}</span>
+                    <span>Do: {b.validTo}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
       </main>
-
-      {/* Modal: Add News */}
-      {showAddNewsModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-lg font-black text-slate-900">Kreiranje nove vijesti</h3>
-              <button onClick={() => setShowAddNewsModal(false)} className="text-slate-400 hover:text-slate-700 font-bold">✕</button>
-            </div>
-
-            <form onSubmit={handleCreateNews} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Naslov članka:</label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Unesite zvaničan naslov..."
-                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Kategorija:</label>
-                <select
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
-                >
-                  <option value="Sport i takmičenja">Sport i takmičenja</option>
-                  <option value="Škola plivanja">Škola plivanja</option>
-                  <option value="Vodeni park">Vodeni park</option>
-                  <option value="Događaji">Događaji</option>
-                  <option value="Građanstvo">Građanstvo</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Kratki uvod (prikaz na kartici):</label>
-                <textarea
-                  rows={2}
-                  value={newExcerpt}
-                  onChange={(e) => setNewExcerpt(e.target.value)}
-                  placeholder="Dvije do tri rečenice koje privlače pažnju..."
-                  className="w-full px-4 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Puni tekst vijesti:</label>
-                <textarea
-                  rows={4}
-                  value={newContent}
-                  onChange={(e) => setNewContent(e.target.value)}
-                  placeholder="Kompletan tekst saopštenja..."
-                  className="w-full px-4 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setShowAddNewsModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
-                >
-                  Odustani
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase tracking-wider shadow-md"
-                >
-                  Objavi na sajtu
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+

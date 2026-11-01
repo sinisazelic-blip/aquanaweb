@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { Lang, translations } from "@/lib/translations";
@@ -226,7 +226,7 @@ export default function HomePage() {
             <div id="gob" className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-7 relative rounded-3xl overflow-hidden shadow-2xl group">
                 <img
-                  src="/images/ACO_1870-1.jpg"
+                  src="/images/GOB-2.jpg"
                   alt="Gradski olimpijski bazen Banja Luka"
                   className="w-full h-[420px] object-cover group-hover:scale-105 transition duration-700"
                 />
@@ -457,3 +457,4 @@ export default function HomePage() {
     </>
   );
 }
+

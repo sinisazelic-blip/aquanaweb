@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { Lang, translations } from "@/lib/translations";
@@ -31,9 +31,15 @@ export default function Footer({ currentLang }: FooterProps) {
                 ? "Public Enterprise „Aquana“ Ltd. Banja Luka. Managing the municipal water park and FINA Olympic pool."
                 : "Javno preduzeće „Aquana“ d.o.o. Banja Luka. Upravljanje vodenim parkom i Gradskim olimpijskim bazenom."}
             </p>
-            <div className="text-[11px] text-slate-500 space-y-0.5">
-              <p>JIB: 4402636750000</p>
-              <p>PIB: 402636750000</p>
+            <div className="text-[11px] text-slate-400 space-y-1.5 pt-2 border-t border-slate-800/80">
+              <div>
+                <p className="font-bold text-slate-300">JP „AQUANA“ d.o.o. Banja Luka</p>
+                <p className="text-slate-500 font-mono">JIB: 4402636750000 • PIB: 402636750000</p>
+              </div>
+              <div>
+                <p className="font-bold text-slate-300">Gradski olimpijski bazen (GOB)</p>
+                <p className="text-slate-500">Objekat u javnom vlasništvu Grada Banja Luka (Upravlja JP „Aquana“)</p>
+              </div>
             </div>
           </div>
 
@@ -113,8 +119,21 @@ export default function Footer({ currentLang }: FooterProps) {
           </div>
         </div>
 
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4 border-t border-slate-800/60 mt-8">
           <p>© {new Date().getFullYear()} JP „Aquana“ d.o.o. Banja Luka. Sva prava zadržana.</p>
+          
+          {/* Powered by Fluxa - Discreet & Subtle */}
+          <div className="flex items-center gap-1.5 text-slate-500">
+            <span className="text-[10px] text-slate-500 font-normal">Powered by</span>
+            <a
+              href="mailto:info@fluxa.ba?subject=Aquana%20Web%20Portal%20-%20Upit"
+              className="inline-flex items-center transition opacity-45 hover:opacity-90"
+              title="Fluxa IT"
+            >
+              <img src="/firma/logo-light.png" alt="Fluxa" className="h-3 w-auto object-contain" />
+            </a>
+          </div>
+
           <p className="flex items-center gap-2">
             <span>JP Aquana • Grad Banja Luka</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold text-[10px] border border-emerald-500/30">
@@ -127,3 +146,6 @@ export default function Footer({ currentLang }: FooterProps) {
     </footer>
   );
 }
+
+
+

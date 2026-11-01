@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo } from "react";
 import { allNewsArticles, NewsItem } from "@/lib/newsData";
@@ -13,7 +13,17 @@ export default function VijestiArchivePage() {
   const [currentLang, setCurrentLang] = useState<any>("lat");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedYear, setSelectedYear] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const availableYears = useMemo(() => {
+    const years = new Set<string>();
+    allNewsArticles.forEach((a) => {
+      const match = a.date.match(/20\d{2}/);
+      if (match) years.add(match[0]);
+    });
+    return ["all", ...Array.from(years).sort().reverse()];
+  }, []);
 
   const categories = useMemo(() => {
     const set = new Set(allNewsArticles.map((a) => a.category));
@@ -28,9 +38,11 @@ export default function VijestiArchivePage() {
         item.date.includes(searchQuery);
       const matchCategory =
         selectedCategory === "all" || item.category === selectedCategory;
-      return matchSearch && matchCategory;
+      const matchYear =
+        selectedYear === "all" || item.date.includes(selectedYear);
+      return matchSearch && matchCategory && matchYear;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, selectedYear]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
   const paginated = useMemo(() => {
@@ -98,6 +110,28 @@ export default function VijestiArchivePage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            {/* Year Selector */}
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <span className="text-[10px] font-bold text-slate-500 uppercase px-1.5 flex items-center gap-1">
+                <Calendar className="w-3 h-3 text-sky-600" />
+                <span>Godina:</span>
+              </span>
+              {availableYears.map((yr) => (
+                <button
+                  key={yr}
+                  onClick={() => { setSelectedYear(yr); setCurrentPage(1); }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition ${
+                    selectedYear === yr
+                      ? "bg-sky-600 text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  {yr === "all" ? "Sve" : yr}
+                </button>
+              ))}
+            </div>
+
+            {/* Category Selector */}
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -108,7 +142,7 @@ export default function VijestiArchivePage() {
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
-                {cat === "all" ? "Sve kategorije" : cat}
+                {cat === "all" ? "Sve teme" : cat}
               </button>
             ))}
           </div>
@@ -145,6 +179,10 @@ export default function VijestiArchivePage() {
 
                 <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-sky-800 bg-sky-50 px-2.5 py-0.5 rounded-md w-fit border border-sky-100">
+                      <Calendar className="w-3 h-3 text-sky-600" />
+                      <span>Objavljeno: {item.date}</span>
+                    </div>
                     <h3 className="font-black text-slate-900 text-lg leading-snug group-hover:text-sky-600 transition">
                       {item.title}
                     </h3>
@@ -223,3 +261,4 @@ export default function VijestiArchivePage() {
     </div>
   );
 }
+

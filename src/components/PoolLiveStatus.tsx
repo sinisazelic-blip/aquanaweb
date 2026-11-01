@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { Lang } from "@/lib/translations";
@@ -61,14 +61,14 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
 
       {/* Main Grid: Radar Widget on Left + Metrics & Schedule on Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8">
-        {/* Left Column: Official Live Radar Widget Frame */}
-        <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden text-white">
-          <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800 text-xs">
-            <span className="flex items-center gap-1.5 font-bold text-sky-400">
-              <Radio className="w-4 h-4 animate-pulse text-rose-500" />
+        {/* Left Column: Official Live Radar Widget Frame (Vibrant & Aquatic Light Theme) */}
+        <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-100/60 rounded-3xl border-2 border-sky-200/90 shadow-xl shadow-sky-900/5 relative overflow-hidden text-slate-800">
+          <div className="w-full flex items-center justify-between pb-3 border-b border-sky-200 text-xs">
+            <span className="flex items-center gap-1.5 font-extrabold text-sky-900">
+              <Radio className="w-4 h-4 animate-pulse text-sky-600" />
               <span>{activeRadar === "gob" ? "Radar GOB: Broj plivača u vodi" : "Radar VP: Posjećenost (Ljetna sezona)"}</span>
             </span>
-            <span className="text-[10px] text-slate-400 font-mono">ulazi.aquana.ba</span>
+            <span className="text-[11px] text-sky-700 font-mono font-bold bg-sky-100/80 px-2 py-0.5 rounded-md border border-sky-200">ulazi.aquana.ba</span>
           </div>
 
           {/* Iframe widget for GOB radar */}
@@ -85,17 +85,18 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
             </div>
           ) : (
             <div className="w-full h-[340px] flex flex-col items-center justify-center text-center p-6 space-y-3">
-              <div className="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
                 <Clock className="w-8 h-8" />
               </div>
-              <h4 className="text-lg font-bold text-white">Vodeni park – Van sezone</h4>
-              <p className="text-xs text-slate-400 max-w-xs">
+              <h4 className="text-lg font-black text-slate-900">Vodeni park – Van sezone</h4>
+              <p className="text-xs text-slate-600 max-w-xs font-medium">
                 Tripodi i radar vodenog parka na kapijama Borik se automatski aktiviraju sa početkom ljetne kupališne sezone 2026.
               </p>
             </div>
           )}
 
-          <div className="w-full text-center pt-2 border-t border-slate-800 text-[11px] text-slate-400 font-medium">
+          <div className="w-full text-center pt-2 border-t border-sky-200 text-[11px] text-sky-800 font-semibold flex items-center justify-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             <span>Automatsko osvježavanje sa sistema tripoda GOB-a</span>
           </div>
         </div>
@@ -187,3 +188,4 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
     </div>
   );
 }
+

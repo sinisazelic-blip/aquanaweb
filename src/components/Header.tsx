@@ -111,38 +111,38 @@ export default function Header({ currentLang, setLang, onOpenSurvey, searchQuery
           />
         </Link>
 
-        <nav className="hidden xl:flex items-center gap-6 font-bold text-xs tracking-wider text-slate-800 uppercase">
+        <nav className="hidden xl:flex items-center gap-5 font-bold text-xs tracking-wider text-slate-800 uppercase">
           <Link href="/gob" className="hover:text-sky-600 transition flex items-center gap-1">
-            Gradski bazen (GOB)
+            {t.nav.gob}
           </Link>
           <Link href="/vodeni-park" className="hover:text-sky-600 transition flex items-center gap-1">
-            Vodeni park
+            {t.nav.aquana}
           </Link>
           <Link href="/cjenovnik" className="hover:text-sky-600 transition flex items-center gap-1">
             <Tag className="w-3.5 h-3.5 text-amber-500" />
-            <span>Cjenovnik</span>
+            <span>{t.nav.pricing}</span>
           </Link>
           <Link href="/vijesti" className="hover:text-sky-600 transition flex items-center gap-1">
             <Newspaper className="w-3.5 h-3.5 text-sky-500" />
-            <span>Vijesti</span>
+            <span>{t.nav.news}</span>
           </Link>
           <Link
             href="/dokumenti"
             className="text-slate-700 hover:text-cyan-700 font-extrabold flex items-center gap-1 bg-slate-50 hover:bg-cyan-50 px-3 py-1.5 rounded-xl border border-slate-200 transition"
           >
             <FileText className="w-3.5 h-3.5 text-cyan-600" />
-            <span>Dokumenti i nalazi</span>
+            <span>{t.nav.documents}</span>
           </Link>
           <Link
             href="/javne-nabavke"
             className="text-sky-800 hover:text-sky-950 font-extrabold flex items-center gap-1 bg-sky-50 px-3 py-1.5 rounded-xl border border-sky-200 transition"
           >
             <ShieldCheck className="w-4 h-4 text-sky-600" />
-            <span>Javne nabavke</span>
+            <span>{t.nav.tenders}</span>
           </Link>
           <button
             onClick={onOpenSurvey}
-            className="text-amber-600 hover:text-amber-700 font-extrabold flex items-center gap-1 tracking-wide"
+            className="text-amber-600 hover:text-amber-700 font-extrabold flex items-center gap-1 tracking-wide cursor-pointer"
           >
             ★ {t.nav.survey}
           </button>
@@ -153,11 +153,14 @@ export default function Header({ currentLang, setLang, onOpenSurvey, searchQuery
 
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="#portal"
+            href="https://klubovi.aquana.ba"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="EnterSYS B2B portal za sportske klubove"
             className="flex items-center gap-2 bg-gradient-to-r from-sky-700 to-blue-800 hover:from-sky-800 hover:to-blue-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition hover:scale-105"
           >
             <ShieldCheck className="w-4 h-4 text-cyan-300" />
-            <span>B2B / Klubovi</span>
+            <span>{t.nav.b2b}</span>
           </a>
         </div>
 
@@ -177,58 +180,60 @@ export default function Header({ currentLang, setLang, onOpenSurvey, searchQuery
             onClick={() => setMobileMenuOpen(false)}
             className="block font-bold text-slate-800 hover:text-sky-600 py-1"
           >
-            Gradski olimpijski bazen (GOB)
+            {t.nav.gob}
           </Link>
           <Link
             href="/vodeni-park"
             onClick={() => setMobileMenuOpen(false)}
             className="block font-bold text-slate-800 hover:text-sky-600 py-1"
           >
-            Vodeni park Aquana
+            {t.nav.aquana}
           </Link>
           <Link
             href="/cjenovnik"
             onClick={() => setMobileMenuOpen(false)}
             className="block font-bold text-amber-600 hover:text-amber-700 py-1"
           >
-            ★ Cjenovnik usluga i ulaznica
+            ★ {t.nav.pricing}
           </Link>
           <Link
             href="/vijesti"
             onClick={() => setMobileMenuOpen(false)}
             className="block font-bold text-slate-800 hover:text-sky-600 py-1"
           >
-            Arhiva vijesti
+            {t.nav.news}
           </Link>
           <Link
             href="/dokumenti"
             onClick={() => setMobileMenuOpen(false)}
             className="block font-extrabold text-cyan-800 hover:text-cyan-950 py-1"
           >
-            ★ Dokumenti, cjenovnici i nalazi vode
+            ★ {t.nav.documents}
           </Link>
           <Link
             href="/javne-nabavke"
             onClick={() => setMobileMenuOpen(false)}
             className="block font-extrabold text-sky-700 hover:text-sky-900 py-1"
           >
-            ★ Javne nabavke (Tenderi)
+            ★ {t.nav.tenders}
           </Link>
           <button
             onClick={() => {
               setMobileMenuOpen(false);
               onOpenSurvey();
             }}
-            className="block w-full text-left font-bold text-amber-600 py-1"
+            className="block w-full text-left font-bold text-amber-600 py-1 cursor-pointer"
           >
             ★ {t.nav.survey}
           </button>
           <a
-            href="#portal"
+            href="https://klubovi.aquana.ba"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setMobileMenuOpen(false)}
             className="block font-bold text-blue-700 py-1"
           >
-            B2B / Klubovi
+            {t.nav.b2b}
           </a>
         </div>
       )}

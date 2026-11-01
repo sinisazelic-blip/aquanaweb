@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
@@ -14,7 +14,8 @@ import {
   Sun,
   CheckCircle2,
   ArrowRight,
-  Info
+  Info,
+  Eye
 } from "lucide-react";
 import Link from "next/link";
 
@@ -93,6 +94,44 @@ export default function CjenovnikPage() {
               <div>
                 <strong className="text-slate-900 block font-bold">Informacije o radnom vremenu:</strong>
                 <span>Gradski olimpijski bazen radi svakog radnog dana od 06:00 do 22:00h, a vikendom od 07:00 do 22:00h. Kupovina karata se vrši na recepciji GOB-a ili putem elektronske evidencije.</span>
+              </div>
+            </div>
+
+            {/* Zvanični cjenovnik propisan Odlukom Gradonačelnika Grada Banja Luka */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-950 via-sky-950 to-slate-950 text-white shadow-xl border border-sky-400/40 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
+              <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="space-y-2 text-center lg:text-left z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-xs font-bold border border-sky-400/30 uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-cyan-300" />
+                  <span>ODLUKA GRADONAČELNIKA GRADA BANJA LUKA</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                  Zvanični cjenovnik usluga GOB-a propisan od strane Grada Banja Luka
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                  Kao vlasnik sportskog objekta Gradskog olimpijskog bazena, Grad Banja Luka i Gradonačelnik zvanično propisuju tarifu za rekreativce, plivačke i vaterpolo klubove, te povlaštene kategorije građana.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 z-10 w-full sm:w-auto justify-center">
+                <a
+                  href="/dokumenti/Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-105"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Pogledaj potpisani cjenovnik (PDF)</span>
+                </a>
+                <a
+                  href="/dokumenti/Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                  download="Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                  className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Preuzmi</span>
+                </a>
               </div>
             </div>
 
@@ -203,6 +242,44 @@ export default function CjenovnikPage() {
               </div>
             </div>
 
+            {/* Zvanični cjenovnik propisan Odlukom Gradonačelnika Grada Banja Luka */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-950 via-sky-950 to-slate-950 text-white shadow-xl border border-sky-400/40 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
+              <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="space-y-2 text-center lg:text-left z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-xs font-bold border border-sky-400/30 uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-cyan-300" />
+                  <span>ODLUKA GRADONAČELNIKA GRADA BANJA LUKA</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                  Zvanični cjenovnik usluga GOB-a propisan od strane Grada Banja Luka
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                  Kao vlasnik sportskog objekta Gradskog olimpijskog bazena, Grad Banja Luka i Gradonačelnik zvanično propisuju tarifu za rekreativce, plivačke i vaterpolo klubove, te povlaštene kategorije građana.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 z-10 w-full sm:w-auto justify-center">
+                <a
+                  href="/dokumenti/Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-105"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Pogledaj potpisani cjenovnik (PDF)</span>
+                </a>
+                <a
+                  href="/dokumenti/Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                  download="Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                  className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Preuzmi</span>
+                </a>
+              </div>
+            </div>
+
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -296,3 +373,4 @@ export default function CjenovnikPage() {
     </div>
   );
 }
+

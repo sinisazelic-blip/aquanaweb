@@ -1,18 +1,31 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Palette, Trophy, Upload, Sparkles, Heart, CheckCircle2, ArrowRight } from "lucide-react";
+import { getKidsDrawings, saveKidsDrawing, KidsDrawingSubmission } from "@/lib/submissionsData";
 
 export default function KidsContestBanner() {
   const [submitted, setSubmitted] = useState(false);
   const [childName, setChildName] = useState("");
   const [parentPhone, setParentPhone] = useState("");
+  const [drawings, setDrawings] = useState<KidsDrawingSubmission[]>([]);
 
-  const recentDrawings = [
-    { id: 1, author: "Luka (8 god)", title: "Moj skok sa tobogana u Boriku", votes: 42, icon: "🎨" },
-    { id: 2, author: "Sara (6 god)", title: "Olimpijski bazen i zlatna ribica", votes: 58, icon: "🏊‍♀️" },
-    { id: 3, author: "Stefan (10 god)", title: "Vaterpolisti na GOB-u", votes: 35, icon: "🤽‍♂️" },
-  ];
+  useEffect(() => {
+    setDrawings(getKidsDrawings());
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!childName.trim() || !parentPhone.trim()) return;
+    const newEntry = saveKidsDrawing({
+      childName: childName.trim(),
+      age: 8,
+      title: "Moj omiljeni trenutak u vodi",
+      parentPhone: parentPhone.trim()
+    });
+    setDrawings((prev) => [newEntry, ...prev]);
+    setSubmitted(true);
+  };
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-10">
@@ -37,11 +50,11 @@ export default function KidsContestBanner() {
 
             {/* Submissions Mini Gallery */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              {recentDrawings.map((d) => (
+              {drawings.slice(0, 3).map((d) => (
                 <div key={d.id} className="p-3 rounded-2xl bg-white/10 border border-white/15 flex items-center gap-3">
-                  <span className="text-2xl">{d.icon}</span>
+                  <span className="text-2xl">🎨</span>
                   <div className="overflow-hidden">
-                    <strong className="text-xs text-white block truncate">{d.author}</strong>
+                    <strong className="text-xs text-white block truncate">{d.childName} ({d.age} god)</strong>
                     <span className="text-[10px] text-purple-300 block truncate">{d.title}</span>
                     <span className="text-[10px] text-amber-300 font-bold flex items-center gap-1 mt-0.5">
                       <Heart className="w-3 h-3 fill-amber-300" /> {d.votes} glasova
@@ -68,16 +81,22 @@ export default function KidsContestBanner() {
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <h4 className="text-base font-bold text-white">Crtež je uspješno poslat!</h4>
-                <p className="text-xs text-slate-300">Hvala vam! Objavljujemo ga u dječijoj galeriji čim ga moderator pregleda.</p>
+                <p className="text-xs text-slate-300">
+                  Hvala vam! Crtež je zabilježen u bazi JP Aquana i biće izložen u galeriji nakon pregleda administratora.
+                </p>
+                <button
+                  onClick={() => {
+                    setSubmitted(false);
+                    setChildName("");
+                    setParentPhone("");
+                  }}
+                  className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition"
+                >
+                  Pošalji još jedan rad
+                </button>
               </div>
             ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (childName.trim()) setSubmitted(true);
-                }}
-                className="space-y-3"
-              >
+              <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label className="block text-[11px] font-bold text-slate-300 uppercase mb-1">Ime i uzrast djeteta:</label>
                   <input

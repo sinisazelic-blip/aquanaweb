@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
@@ -20,7 +20,8 @@ import {
   Download,
   FileText,
   ArrowRight,
-  Users
+  Users,
+  Eye
 } from "lucide-react";
 import Link from "next/link";
 import { realClubs } from "@/lib/realPoolData";
@@ -36,35 +37,45 @@ export default function GobDetailedPage() {
         onOpenSurvey={() => {}}
       />
 
-      {/* Hero Header */}
-      <section className="relative bg-slate-950 text-white py-16 lg:py-24 px-4 sm:px-8 overflow-hidden">
-        <div className="absolute inset-0 opacity-35">
+      {/* Hero Header - Positioned Bottom-Left over natural darker aquatic background */}
+      <section className="relative text-white min-h-[580px] lg:min-h-[640px] pt-32 pb-12 sm:pb-16 px-4 sm:px-8 overflow-hidden flex items-end bg-blue-950">
+        {/* Crisp Olympic pool photo without dark gloom */}
+        <div className="absolute inset-0">
           <img
-            src="/images/ACO_1870-1.jpg"
-            alt="Gradski olimpijski bazen"
-            className="w-full h-full object-cover object-center"
+            src="/images/GOB-20.jpg"
+            alt="Gradski olimpijski bazen Banja Luka"
+            className="w-full h-full object-cover object-center brightness-105 saturate-[1.2]"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent" />
+        {/* Olympic Blue Gradient - Stronger in bottom-left for crisp effortless reading */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-950/95 via-blue-950/55 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/20 to-transparent" />
 
-        <div className="relative max-w-7xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-black uppercase tracking-wider backdrop-blur-md">
-            <Award className="w-4 h-4 text-sky-400" />
-            <span>FINA Olimpijski standard • Banja Luka</span>
+        <div className="relative max-w-7xl w-full mx-auto space-y-5 text-left">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/30 border border-sky-400/40 text-sky-200 text-xs font-black uppercase tracking-wider backdrop-blur-md">
+              <Award className="w-4 h-4 text-cyan-300" />
+              <span>FINA Olimpijski standard • Banja Luka</span>
+            </div>
+            {/* Official GOB Emblem */}
+            <div className="inline-flex items-center gap-2 bg-white/95 px-3 py-1.5 rounded-2xl shadow-lg border border-white">
+              <img src="/firma/gob-logo.png" alt="GOB Logo" className="h-6 w-auto object-contain" />
+              <span className="text-[11px] font-black text-blue-950 uppercase tracking-wider">Zvanični sportski centar</span>
+            </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl drop-shadow-md">
             Gradski olimpijski bazen (GOB)
           </h1>
 
-          <p className="text-slate-300 text-base sm:text-xl max-w-3xl leading-relaxed">
+          <p className="text-slate-100 text-base sm:text-xl max-w-3xl leading-relaxed drop-shadow">
             Jedan od tri najsavremenija olimpijska bazena u Evropi. Izgrađen po strogim standardima Svjetske plivačke federacije, dom plivačkih i vaterpolo klubova, te omiljeno mjesto za rekreaciju i obuku neplivača svih generacija.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-4">
             <a
               href="#cjenovnik"
-              className="px-7 py-3.5 rounded-2xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-sm tracking-wide transition shadow-lg shadow-sky-500/20 flex items-center gap-2"
+              className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-blue-950 font-black text-sm tracking-wide transition shadow-xl shadow-cyan-500/25 flex items-center gap-2"
             >
               <span>Zvanični cjenovnik GOB-a</span>
               <ArrowRight className="w-4 h-4" />
@@ -72,7 +83,7 @@ export default function GobDetailedPage() {
 
             <a
               href="tel:065725050"
-              className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/25 backdrop-blur-md transition flex items-center gap-2"
+              className="px-6 py-3.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm border border-white/30 backdrop-blur-md transition flex items-center gap-2 shadow-md"
             >
               <Phone className="w-4 h-4 text-amber-300" />
               <span>Obuka neplivača: 065 72 50 50</span>
@@ -105,7 +116,7 @@ export default function GobDetailedPage() {
               <span className="text-3xl font-black text-cyan-600 block">25 × 10 m</span>
               <h3 className="font-bold text-slate-900 text-sm">Mali bazen za obuku</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Dubina od 0.90 do 1.40 m, prilagođena za školu plivanja, rasplivavanje i rad sa djecom početnicima.
+                Dubina 1.40 m ravnomjerno, prilagođena za školu plivanja, rasplivavanje i rad sa djecom i početnicima.
               </p>
             </div>
 
@@ -151,7 +162,7 @@ export default function GobDetailedPage() {
                 <CheckCircle2 className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-sm text-slate-900 block">Besplatna obuka za banjalučke osnovce (Gradski javni interes)</strong>
-                  <span className="text-xs text-slate-600">Projekat koji u cijelosti finansira Grad Banja Luka, a kroz koji svi učenici osnovnih škola prolaze organizovanu obuku plivanja.</span>
+                  <span className="text-xs text-slate-600">Projekat koji u cijelosti finansira Grad Banja Luka, a kroz koji učenici osnovnih škola prolaze organizovanu obuku plivanja.</span>
                 </div>
               </div>
             </div>
@@ -236,6 +247,41 @@ export default function GobDetailedPage() {
 
         {/* FULL OFFICIAL GOB PRICE LIST TABLE */}
         <section id="cjenovnik" className="space-y-6 pt-6">
+          {/* Zvanični cjenovnik propisan Odlukom Gradonačelnika Grada Banja Luka */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-950 via-sky-950 to-slate-950 text-white shadow-xl border border-sky-400/40 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
+            <div className="space-y-2 text-center lg:text-left z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-xs font-bold border border-sky-400/30 uppercase tracking-wider">
+                <ShieldCheck className="w-4 h-4 text-cyan-300" />
+                <span>ODLUKA GRADONAČELNIKA GRADA BANJA LUKA</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                Zvanični cjenovnik usluga GOB-a propisan od strane Grada Banja Luka
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                Kao vlasnik sportskog objekta Gradskog olimpijskog bazena, Grad Banja Luka i Gradonačelnik zvanično donose i propisuju tarifu za sve kategorije građana, klubova, rekreativaca i povlaštenih lica.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 z-10 w-full sm:w-auto justify-center">
+              <a
+                href="/dokumenti/Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-105"
+              >
+                <Eye className="w-4 h-4" />
+                <span>Pogledaj potpisani cjenovnik (PDF)</span>
+              </a>
+              <a
+                href="/dokumenti/Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                download="Zvanicni-cjenovnik-usluga-GOB-2024.pdf"
+                className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition"
+              >
+                <Download className="w-4 h-4" />
+                <span>Preuzmi</span>
+              </a>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
               <span className="text-xs font-bold text-sky-600 uppercase tracking-widest block">SLUŽBENI CJENOVNIK</span>
@@ -345,3 +391,6 @@ export default function GobDetailedPage() {
     </div>
   );
 }
+
+
+

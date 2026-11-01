@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Coffee, Flame, Sparkles, Clock, Ticket, ArrowRight, Gift, Trophy, Gamepad2 } from "lucide-react";
+import { Coffee, Flame, Sparkles, Clock, Ticket, ArrowRight, Gift, Trophy, Gamepad2, CheckCircle2, Phone, X } from "lucide-react";
+import { saveCoupon } from "@/lib/submissionsData";
 
 interface FlashPromoActionProps {
   onOpenGame: () => void;
 }
 
 export default function FlashPromoAction({ onOpenGame }: FlashPromoActionProps) {
-  // Countdown timer: 03h 48m 22s
+  // Countdown timer
   const [timeLeft, setTimeLeft] = useState({ hours: 3, minutes: 48, seconds: 22 });
-  const [claimed, setClaimed] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [claimedCoupon, setClaimedCoupon] = useState<{ code: string; phone: string } | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -27,6 +30,13 @@ export default function FlashPromoAction({ onOpenGame }: FlashPromoActionProps) 
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const handleClaimSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone.trim()) return;
+    const newCoupon = saveCoupon(phone.trim());
+    setClaimedCoupon({ code: newCoupon.code, phone: newCoupon.phone });
+  };
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-6">
@@ -100,15 +110,15 @@ export default function FlashPromoAction({ onOpenGame }: FlashPromoActionProps) 
             <div className="flex flex-wrap items-center justify-center gap-3 w-full sm:w-auto">
               {/* Button A: Preuzmi kupon */}
               <button
-                onClick={() => setClaimed(true)}
+                onClick={() => setModalOpen(true)}
                 className={`px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition shadow-lg flex items-center gap-2 ${
-                  claimed
-                    ? "bg-emerald-500 text-slate-950"
+                  claimedCoupon
+                    ? "bg-emerald-500 text-slate-950 shadow-emerald-500/30"
                     : "bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 hover:scale-105"
                 }`}
               >
                 <Ticket className="w-4 h-4" />
-                <span>{claimed ? "KUPON REZERVISAN (#50K-26)" : "REZERVIŠI KUPON ODMAH"}</span>
+                <span>{claimedCoupon ? `KUPON REZERVISAN (${claimedCoupon.code})` : "REZERVIŠI KUPON ODMAH"}</span>
               </button>
 
               {/* Button B: Pokreni igru uhvati ribicu */}
@@ -123,6 +133,87 @@ export default function FlashPromoAction({ onOpenGame }: FlashPromoActionProps) 
           </div>
         </div>
       </div>
+
+      {/* Claim Coupon Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative">
+            <button
+              onClick={() => setModalOpen(false)}
+              className="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {claimedCoupon ? (
+              <div className="text-center space-y-4 py-4">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+                  <CheckCircle2 className="w-9 h-9" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900">Kupon uspješno rezervisan!</h3>
+                <p className="text-xs text-slate-600">
+                  Pokažite ovaj digitalni kod na biletarnici GOB-a prilikom kupovine paketa od 50 ulazaka:
+                </p>
+
+                <div className="bg-amber-50 border-2 border-dashed border-amber-300 rounded-2xl p-4 text-center space-y-1">
+                  <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">Digitalni Voucher Kod</span>
+                  <div className="text-2xl font-black font-mono text-slate-900 tracking-wider">
+                    {claimedCoupon.code}
+                  </div>
+                  <span className="text-[11px] text-slate-500 font-medium">Telefon: {claimedCoupon.phone}</span>
+                </div>
+
+                <div className="text-[11px] text-slate-400">
+                  Vaučer je zabilježen u sistemu JP Aquana. Čekamo Vas na GOB-u!
+                </div>
+
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider"
+                >
+                  Zatvori prozor
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleClaimSubmit} className="space-y-4">
+                <div className="flex items-center gap-2 text-amber-600 text-xs font-black uppercase tracking-wider">
+                  <Flame className="w-4 h-4 fill-amber-500" />
+                  <span>Brza registracija kupona</span>
+                </div>
+
+                <h3 className="text-xl font-black text-slate-900">
+                  Preuzmite kupon za 5 besplatnih kafa
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Unesite broj telefona kako bi Vaš jedinstveni kupon bio evidentiran na biletarnici i u Caffe Baru GOB.
+                </p>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Broj mobilnog telefona:</span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="npr. 065 123 456"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/25 transition hover:scale-[1.01]"
+                >
+                  Potvrdi i generiši kod kupona
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
