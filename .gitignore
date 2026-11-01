@@ -1,0 +1,35 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+build/
+dist/
+
+# Large database dumps & temporary analysis scripts
+*.sql
+*.xml
+*.CR2
+*.MOV
+*.mp4
+
+# Environment variables & local secrets
+.env*.local
+.env
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.sublime-workspace
+.vscode/
+.idea/
