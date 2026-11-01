@@ -18,6 +18,7 @@ dist/
 *.CR2
 *.MOV
 *.mp4
+/dokumenti/
 
 # Environment variables & local secrets
 .env*.local
