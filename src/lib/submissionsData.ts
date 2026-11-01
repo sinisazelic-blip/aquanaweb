@@ -178,3 +178,166 @@ export const saveKidsDrawing = (drawing: { childName: string; age: number; title
   }
   return newEntry;
 };
+
+// --- ADMIN USERS & ROLES ---
+export type UserRole = "superadmin" | "webadmin" | "referent_nabavke" | "referent_pr";
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  password: string;
+  name: string;
+  title: string;
+  role: UserRole;
+  status: "Aktivan" | "Blokiran";
+  createdAt: string;
+}
+
+export const initialAdminUsers: AdminUser[] = [
+  {
+    id: "usr-1",
+    username: "sinisa",
+    password: "turtle1964",
+    name: "Siniša Zelić",
+    title: "Glavni Administrator / Superadmin",
+    role: "superadmin",
+    status: "Aktivan",
+    createdAt: "01.11.2026."
+  },
+  {
+    id: "usr-2",
+    username: "webadmin",
+    password: "web2026!",
+    name: "Web Urednik",
+    title: "Urednik web portala i vijesti",
+    role: "webadmin",
+    status: "Aktivan",
+    createdAt: "01.11.2026."
+  },
+  {
+    id: "usr-3",
+    username: "nabavke",
+    password: "tender2026!",
+    name: "Referent za javne nabavke",
+    title: "Služba tendera i ugovora",
+    role: "referent_nabavke",
+    status: "Aktivan",
+    createdAt: "01.11.2026."
+  },
+  {
+    id: "usr-4",
+    username: "pr",
+    password: "marketing2026!",
+    name: "PR Referent",
+    title: "Odnosi s javnošću i marketing",
+    role: "referent_pr",
+    status: "Aktivan",
+    createdAt: "01.11.2026."
+  }
+];
+
+export const getAdminUsers = (): AdminUser[] => {
+  if (typeof window === "undefined") return initialAdminUsers;
+  try {
+    const raw = localStorage.getItem("aquana_admin_users");
+    if (!raw) return initialAdminUsers;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialAdminUsers;
+  } catch {
+    return initialAdminUsers;
+  }
+};
+
+export const saveAdminUsers = (users: AdminUser[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aquana_admin_users", JSON.stringify(users));
+  }
+};
+
+// --- COMMERCIAL BANNERS SPECIFICATION & STORAGE ---
+export type BannerPosition = "top_spotlight" | "inter_section" | "sidebar" | "footer_strip";
+
+export interface CommercialBanner {
+  id: string;
+  client: string;
+  position: BannerPosition;
+  dimensions: string;
+  image: string;
+  link: string;
+  validFrom: string;
+  validTo: string;
+  priceNote?: string;
+  status: "Aktivan" | "Pasivan";
+}
+
+export const BANNER_SLOTS: Record<BannerPosition, { title: string; dimensions: string; description: string; recommendedPrice: string }> = {
+  top_spotlight: {
+    title: "Pozicija A: Header / Top Spotlight Billboard",
+    dimensions: "1200 x 160 px",
+    description: "Najviša vidljivost na vrhu sajta, iznad glavnog menija i radara. Prikazuje se svim posjetiocima.",
+    recommendedPrice: "400 KM / mjesečno"
+  },
+  inter_section: {
+    title: "Pozicija B: Panorama Banner između sekcija",
+    dimensions: "1280 x 240 px",
+    description: "Dominantni panoramski baner između radara popunjenosti i rasporeda bazena. Idealan za fitnes centre i sponzore mitinga.",
+    recommendedPrice: "350 KM / mjesečno"
+  },
+  sidebar: {
+    title: "Pozicija C: Skyscraper baner uz raspored / vijesti",
+    dimensions: "360 x 500 px",
+    description: "Vertikalni format u desnom stupcu uz raspored termina za rekreativce ili arhivu vijesti.",
+    recommendedPrice: "250 KM / mjesečno"
+  },
+  footer_strip: {
+    title: "Pozicija D: Institucionalni / Korporativni strip u dnu",
+    dimensions: "1200 x 100 px",
+    description: "Stalna traka partnera i generalnih sponzora neposredno iznad footera.",
+    recommendedPrice: "200 KM / mjesečno"
+  }
+};
+
+export const initialBanners: CommercialBanner[] = [
+  {
+    id: "ban-1",
+    client: "Fitness Centar GOB (Zakupac prostora)",
+    position: "inter_section",
+    dimensions: "1280 x 240 px",
+    image: "/images/GOB-14.jpg",
+    link: "https://aquana.ba",
+    validFrom: "01.01.2026.",
+    validTo: "31.12.2026.",
+    priceNote: "350 KM/mjesec",
+    status: "Aktivan"
+  },
+  {
+    id: "ban-2",
+    client: "m:tel – Zvanični partner i sponzor plivačkog mitinga",
+    position: "top_spotlight",
+    dimensions: "1200 x 160 px",
+    image: "/images/Plivacki-Meeting-1.jpg",
+    link: "https://mtel.ba",
+    validFrom: "15.10.2026.",
+    validTo: "30.11.2026.",
+    priceNote: "400 KM/mjesec",
+    status: "Aktivan"
+  }
+];
+
+export const getCommercialBanners = (): CommercialBanner[] => {
+  if (typeof window === "undefined") return initialBanners;
+  try {
+    const raw = localStorage.getItem("aquana_commercial_banners");
+    if (!raw) return initialBanners;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialBanners;
+  } catch {
+    return initialBanners;
+  }
+};
+
+export const saveCommercialBanners = (banners: CommercialBanner[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aquana_commercial_banners", JSON.stringify(banners));
+  }
+};

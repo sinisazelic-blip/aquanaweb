@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -33,39 +33,32 @@ import {
   Star,
   MessageSquare,
   Phone,
-  Filter
+  Filter,
+  Edit,
+  KeyRound,
+  ExternalLink,
+  Info
 } from "lucide-react";
 import Link from "next/link";
 import { allNewsArticles, NewsItem } from "@/lib/newsData";
-import { initialTenders, TenderItem } from "@/lib/tendersData";
+import { initialTenders, TenderItem, getStoredTenders, saveStoredTenders } from "@/lib/tendersData";
 import {
   getSurveys,
   getCoupons,
   getKidsDrawings,
   SurveySubmission,
   CouponClaim,
-  KidsDrawingSubmission
+  KidsDrawingSubmission,
+  UserRole,
+  AdminUser,
+  getAdminUsers,
+  saveAdminUsers,
+  CommercialBanner,
+  BANNER_SLOTS,
+  BannerPosition,
+  getCommercialBanners,
+  saveCommercialBanners
 } from "@/lib/submissionsData";
-
-type UserRole = "superadmin" | "webadmin" | "referent_nabavke" | "referent_pr";
-
-interface CommercialBanner {
-  id: number;
-  client: string;
-  position: "top_bar" | "inter_section" | "sidebar";
-  image: string;
-  link: string;
-  validFrom: string;
-  validTo: string;
-  isActive: boolean;
-}
-
-const ROLE_CREDENTIALS: Record<string, { role: UserRole; name: string; title: string }> = {
-  superadmin: { role: "superadmin", name: "Siniša Zelić", title: "Glavni Administrator (Superadmin)" },
-  webadmin: { role: "webadmin", name: "Web Administrator", title: "Urednik web portala" },
-  nabavke: { role: "referent_nabavke", name: "Referent za javne nabavke", title: "Služba nabavki i ugovora" },
-  pr: { role: "referent_pr", name: "PR & Marketing referent", title: "Odnosi s javnošću i marketing" }
-};
 
 export default function AdminPortalPage() {
   // Authentication State
@@ -73,11 +66,18 @@ export default function AdminPortalPage() {
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [currentRole, setCurrentRole] = useState<UserRole>("superadmin");
-  const [userProfile, setUserProfile] = useState({ name: "Siniša Zelić", title: "Glavni Administrator" });
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+
+  // Users State (User & Role Management)
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newRole, setNewRole] = useState<UserRole>("webadmin");
 
   // Navigation Tab State
-  const [activeTab, setActiveTab] = useState<"surveys" | "coupons" | "drawings" | "news" | "tenders" | "banners">("surveys");
+  const [activeTab, setActiveTab] = useState<"surveys" | "coupons" | "drawings" | "news" | "tenders" | "banners" | "users">("surveys");
 
   // Submissions State
   const [surveys, setSurveys] = useState<SurveySubmission[]>([]);
@@ -86,56 +86,55 @@ export default function AdminPortalPage() {
 
   // News State
   const [newsList, setNewsList] = useState<NewsItem[]>(allNewsArticles);
-  const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState("Sport i takmičenja");
-  const [newExcerpt, setNewExcerpt] = useState("");
   const [showAddNewsModal, setShowAddNewsModal] = useState(false);
 
   // Tenders State
-  const [tendersList, setTendersList] = useState<TenderItem[]>(initialTenders);
+  const [tendersList, setTendersList] = useState<TenderItem[]>([]);
+  const [showAddTenderModal, setShowAddTenderModal] = useState(false);
+  const [newTenderTitle, setNewTenderTitle] = useState("");
+  const [newTenderYear, setNewTenderYear] = useState("2026");
+  const [newTenderStatus, setNewTenderStatus] = useState<TenderItem["status"]>("Aktivno");
+  const [newTenderFile, setNewTenderFile] = useState("");
 
   // Commercial Banners State
-  const [commercialBanners, setCommercialBanners] = useState<CommercialBanner[]>([
-    {
-      id: 1,
-      client: "Fitness Centar GOB (Zakupac)",
-      position: "inter_section",
-      image: "/images/GOB-14.jpg",
-      link: "https://aquana.ba",
-      validFrom: "01.01.2026.",
-      validTo: "31.12.2026.",
-      isActive: true,
-    },
-    {
-      id: 2,
-      client: "m:tel – Sponzor plivačkog mitinga",
-      position: "top_bar",
-      image: "/images/Plivacki-Meeting-1.jpg",
-      link: "https://mtel.ba",
-      validFrom: "15.10.2026.",
-      validTo: "30.11.2026.",
-      isActive: true,
-    }
-  ]);
+  const [bannersList, setBannersList] = useState<CommercialBanner[]>([]);
+  const [showAddBannerModal, setShowAddBannerModal] = useState(false);
+  const [newBannerClient, setNewBannerClient] = useState("");
+  const [newBannerPosition, setNewBannerPosition] = useState<BannerPosition>("top_spotlight");
+  const [newBannerImage, setNewBannerImage] = useState("/images/GOB-14.jpg");
+  const [newBannerLink, setNewBannerLink] = useState("https://aquana.ba");
+  const [newBannerValidFrom, setNewBannerValidFrom] = useState("01.11.2026.");
+  const [newBannerValidTo, setNewBannerValidTo] = useState("31.12.2026.");
+  const [newBannerPrice, setNewBannerPrice] = useState("400 KM/mj");
 
-  // Load session & submissions on mount
+  // Load session & data on mount
   useEffect(() => {
+    const loadedUsers = getAdminUsers();
+    setAdminUsers(loadedUsers);
+
     try {
-      const savedSession = localStorage.getItem("aquana_admin_auth");
-      if (savedSession) {
-        const parsed = JSON.parse(savedSession);
-        setIsAuthenticated(true);
-        setCurrentRole(parsed.role || "superadmin");
-        setUserProfile(parsed.profile || { name: "Siniša Zelić", title: "Glavni Administrator" });
+      const savedAuth = localStorage.getItem("aquana_admin_session");
+      if (savedAuth) {
+        const parsed = JSON.parse(savedAuth);
+        // Find matching live user or fallback
+        const match = loadedUsers.find((u) => u.username === parsed.username) || parsed;
+        if (match && match.status === "Aktivan") {
+          setIsAuthenticated(true);
+          setCurrentUser(match);
+        }
       }
     } catch {
       // ignore
     }
+
     setSurveys(getSurveys());
     setCoupons(getCoupons());
     setDrawings(getKidsDrawings());
+    setTendersList(getStoredTenders());
+    setBannersList(getCommercialBanners());
   }, []);
 
+  // Handle Login (Checks against dynamic users list + always sinisa:turtle1964)
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
@@ -143,26 +142,41 @@ export default function AdminPortalPage() {
     const u = usernameInput.trim().toLowerCase();
     const p = passwordInput.trim();
 
-    if (u === "superadmin" && (p === "aquana2026!" || p === "admin")) {
-      completeLogin("superadmin");
-    } else if (u === "webadmin" && (p === "web2026!" || p === "web")) {
-      completeLogin("webadmin");
-    } else if (u === "nabavke" && (p === "tender2026!" || p === "nabavke")) {
-      completeLogin("nabavke");
-    } else if (u === "pr" && (p === "marketing2026!" || p === "pr")) {
-      completeLogin("pr");
-    } else {
-      setLoginError("Neispravno korisničko ime ili lozinka. Pokušajte ponovo.");
+    // Check hardcoded superadmin first
+    if (u === "sinisa" && p === "turtle1964") {
+      const superadminUser: AdminUser = {
+        id: "usr-sinisa",
+        username: "sinisa",
+        password: "turtle1964",
+        name: "Siniša Zelić",
+        title: "Glavni Administrator / Superadmin",
+        role: "superadmin",
+        status: "Aktivan",
+        createdAt: "01.11.2026."
+      };
+      loginSuccess(superadminUser);
+      return;
     }
+
+    // Check against dynamic users list
+    const found = adminUsers.find((user) => user.username.toLowerCase() === u && user.password === p);
+    if (found) {
+      if (found.status === "Blokiran") {
+        setLoginError("Ovaj nalog je privremeno blokiran od strane administratora.");
+        return;
+      }
+      loginSuccess(found);
+      return;
+    }
+
+    setLoginError("Neispravno korisničko ime ili lozinka. Pokušajte ponovo.");
   };
 
-  const completeLogin = (roleKey: string) => {
-    const cred = ROLE_CREDENTIALS[roleKey];
+  const loginSuccess = (user: AdminUser) => {
     setIsAuthenticated(true);
-    setCurrentRole(cred.role);
-    setUserProfile({ name: cred.name, title: cred.title });
+    setCurrentUser(user);
     try {
-      localStorage.setItem("aquana_admin_auth", JSON.stringify({ role: cred.role, profile: { name: cred.name, title: cred.title } }));
+      localStorage.setItem("aquana_admin_session", JSON.stringify(user));
     } catch {
       // ignore
     }
@@ -170,18 +184,157 @@ export default function AdminPortalPage() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setCurrentUser(null);
     try {
-      localStorage.removeItem("aquana_admin_auth");
+      localStorage.removeItem("aquana_admin_session");
     } catch {
       // ignore
     }
   };
 
-  // Quick switch role helper for superadmin testing
-  const switchRole = (role: UserRole) => {
-    setCurrentRole(role);
-    const key = role === "superadmin" ? "superadmin" : role === "webadmin" ? "webadmin" : role === "referent_nabavke" ? "nabavke" : "pr";
-    setUserProfile({ name: ROLE_CREDENTIALS[key].name, title: ROLE_CREDENTIALS[key].title });
+  // --- USER MANAGEMENT FUNCTIONS (Superadmin only) ---
+  const handleAddUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUsername.trim() || !newPassword.trim()) return;
+
+    const titlesMap: Record<UserRole, string> = {
+      superadmin: "Glavni Administrator / Superadmin",
+      webadmin: "Urednik web portala i vijesti",
+      referent_nabavke: "Referent za javne nabavke i ugovore",
+      referent_pr: "PR & Marketing referent"
+    };
+
+    const newUser: AdminUser = {
+      id: `usr-${Date.now()}`,
+      username: newUsername.trim().toLowerCase(),
+      password: newPassword.trim(),
+      name: newName.trim() || newUsername.trim(),
+      title: titlesMap[newRole],
+      role: newRole,
+      status: "Aktivan",
+      createdAt: new Date().toLocaleDateString("sr-BA")
+    };
+
+    const updated = [newUser, ...adminUsers];
+    setAdminUsers(updated);
+    saveAdminUsers(updated);
+    setShowAddUserModal(false);
+    setNewUsername("");
+    setNewPassword("");
+    setNewName("");
+  };
+
+  const toggleUserStatus = (id: string) => {
+    const updated = adminUsers.map((u) => {
+      if (u.id === id) {
+        if (u.username === "sinisa") return u; // protected master superadmin
+        return { ...u, status: (u.status === "Aktivan" ? "Blokiran" : "Aktivan") as "Aktivan" | "Blokiran" };
+      }
+      return u;
+    });
+    setAdminUsers(updated);
+    saveAdminUsers(updated);
+  };
+
+  const deleteUser = (id: string, username: string) => {
+    if (username === "sinisa") {
+      alert("Nije moguće obrisati glavnog superadmina (sinisa).");
+      return;
+    }
+    if (confirm(`Da li ste sigurni da želite obrisati korisnika "${username}"?`)) {
+      const updated = adminUsers.filter((u) => u.id !== id);
+      setAdminUsers(updated);
+      saveAdminUsers(updated);
+    }
+  };
+
+  // --- BANNER MANAGEMENT FUNCTIONS ---
+  const handleAddBanner = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBannerClient.trim()) return;
+
+    const slotInfo = BANNER_SLOTS[newBannerPosition];
+
+    const newBanner: CommercialBanner = {
+      id: `ban-${Date.now()}`,
+      client: newBannerClient.trim(),
+      position: newBannerPosition,
+      dimensions: slotInfo.dimensions,
+      image: newBannerImage.trim() || "/images/GOB-14.jpg",
+      link: newBannerLink.trim() || "https://aquana.ba",
+      validFrom: newBannerValidFrom.trim(),
+      validTo: newBannerValidTo.trim(),
+      priceNote: newBannerPrice.trim(),
+      status: "Aktivan"
+    };
+
+    const updated = [newBanner, ...bannersList];
+    setBannersList(updated);
+    saveCommercialBanners(updated);
+    setShowAddBannerModal(false);
+    setNewBannerClient("");
+  };
+
+  const toggleBannerStatus = (id: string) => {
+    const updated = bannersList.map((b) =>
+      b.id === id ? { ...b, status: (b.status === "Aktivan" ? "Pasivan" : "Aktivan") as "Aktivan" | "Pasivan" } : b
+    );
+    setBannersList(updated);
+    saveCommercialBanners(updated);
+  };
+
+  const deleteBanner = (id: string) => {
+    if (confirm("Da li ste sigurni da želite ukloniti ovaj sponzorski baner?")) {
+      const updated = bannersList.filter((b) => b.id !== id);
+      setBannersList(updated);
+      saveCommercialBanners(updated);
+    }
+  };
+
+  // --- TENDERS MANAGEMENT FUNCTIONS ---
+  const handleAddTender = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTenderTitle.trim()) return;
+
+    const newTender: TenderItem = {
+      id: Date.now(),
+      title: newTenderTitle.trim(),
+      date: new Date().toLocaleDateString("sr-BA"),
+      year: newTenderYear,
+      status: newTenderStatus,
+      file: newTenderFile.trim() || "Zvanicni-dokument.pdf"
+    };
+
+    const updated = [newTender, ...tendersList];
+    setTendersList(updated);
+    saveStoredTenders(updated);
+    setShowAddTenderModal(false);
+    setNewTenderTitle("");
+  };
+
+  const toggleTenderStatus = (id: number) => {
+    const statuses: TenderItem["status"][] = ["Aktivno", "Dodijeljen ugovor", "Završeno", "Poništeno"];
+    const updated = tendersList.map((t) => {
+      if (t.id === id) {
+        const nextIdx = (statuses.indexOf(t.status) + 1) % statuses.length;
+        return { ...t, status: statuses[nextIdx] };
+      }
+      return t;
+    });
+    setTendersList(updated);
+    saveStoredTenders(updated);
+  };
+
+  const deleteTender = (id: number) => {
+    if (currentUser?.role !== "superadmin") {
+      alert("Samo Superadmin (Siniša Zelić) ima dozvolu za trajno brisanje javnih nabavki iz arhive.");
+      return;
+    }
+    if (confirm("UPOZORENJE (SUPERADMIN): Da li ste sigurni da želite trajno obrisati ovu javnu nabavku?")) {
+      const updated = tendersList.filter((t) => t.id !== id);
+      setTendersList(updated);
+      saveStoredTenders(updated);
+    }
   };
 
   // Coupon toggle status
@@ -199,7 +352,7 @@ export default function AdminPortalPage() {
 
   // Calculate survey averages
   const surveyStats = React.useMemo(() => {
-    if (surveys.length === 0) return { avg: 4.8, cistoca: 4.8, voda: 4.9, temp: 4.7, osoblje: 4.6, count: 0 };
+    if (surveys.length === 0) return { avg: "4.8", cistoca: "4.8", voda: "4.9", temp: "4.7", osoblje: "4.6", count: 0 };
     const total = surveys.reduce((acc, s) => {
       acc.cistoca += s.ratings.cistoca;
       acc.voda += s.ratings.kvalitetVode;
@@ -209,9 +362,8 @@ export default function AdminPortalPage() {
     }, { cistoca: 0, voda: 0, temp: 0, osoblje: 0 });
 
     const count = surveys.length;
-    const avg = ((total.cistoca + total.voda + total.temp + total.osoblje) / (count * 4)).toFixed(1);
     return {
-      avg,
+      avg: ((total.cistoca + total.voda + total.temp + total.osoblje) / (count * 4)).toFixed(1),
       cistoca: (total.cistoca / count).toFixed(1),
       voda: (total.voda / count).toFixed(1),
       temp: (total.temp / count).toFixed(1),
@@ -220,7 +372,7 @@ export default function AdminPortalPage() {
     };
   }, [surveys]);
 
-  // LOGIN SCREEN
+  // LOGIN SCREEN (No automatic shortcuts, clean & secure)
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -228,7 +380,7 @@ export default function AdminPortalPage() {
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-600/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border border-slate-200 relative z-10">
+        <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border border-slate-200 relative z-10 animate-in fade-in zoom-in-95 duration-200">
           <div className="text-center space-y-2 mb-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-cyan-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-sky-600/30">
               <Lock className="w-8 h-8" />
@@ -237,7 +389,7 @@ export default function AdminPortalPage() {
               Aquana CMS Portal
             </h1>
             <p className="text-xs text-slate-500">
-              Autentifikovani pristup za upravu, administratore i referente JP „Aquana“ Banja Luka.
+              Zvanični administrativni pristup JP „Aquana“ d.o.o. Banja Luka
             </p>
           </div>
 
@@ -258,7 +410,7 @@ export default function AdminPortalPage() {
                 required
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
-                placeholder="superadmin / webadmin / nabavke / pr"
+                placeholder="Unesite korisničko ime..."
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
               />
             </div>
@@ -285,49 +437,8 @@ export default function AdminPortalPage() {
             </button>
           </form>
 
-          {/* Quick-Role Testing Shortcuts for Siniša */}
           <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-            <span className="text-[10px] uppercase font-black text-slate-400 block mb-2">
-              Brza prijava po ulogama (testni pristup):
-            </span>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => completeLogin("superadmin")}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
-              >
-                ★ Superadmin
-                <span className="block text-[10px] text-slate-400 font-normal">Siniša Zelić</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => completeLogin("webadmin")}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
-              >
-                ● Webadmin
-                <span className="block text-[10px] text-slate-400 font-normal">Sadržaj & vijesti</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => completeLogin("nabavke")}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
-              >
-                ◆ Javne nabavke
-                <span className="block text-[10px] text-slate-400 font-normal">Tenderi & akti</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => completeLogin("pr")}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold transition text-left"
-              >
-                ▲ PR Referent
-                <span className="block text-[10px] text-slate-400 font-normal">Marketing & kuponi</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-5 text-center">
-            <Link href="/" className="text-xs text-sky-600 hover:text-sky-800 font-bold flex items-center justify-center gap-1">
+            <Link href="/" className="text-xs text-sky-600 hover:text-sky-800 font-bold inline-flex items-center gap-1 transition">
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Povratak na javni sajt</span>
             </Link>
@@ -351,42 +462,28 @@ export default function AdminPortalPage() {
           <span className="text-xs font-bold text-slate-300">JP „Aquana“ d.o.o. Banja Luka</span>
         </div>
 
-        {/* User profile & Role switcher */}
+        {/* User profile & Role */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs border border-sky-500/40">
-              {userProfile.name.slice(0, 2).toUpperCase()}
+              {currentUser?.name.slice(0, 2).toUpperCase() || "SZ"}
             </div>
-            <div className="hidden md:block text-left text-xs">
-              <strong className="block text-white leading-tight">{userProfile.name}</strong>
-              <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider text-sky-400">
-                {currentRole}
+            <div className="text-left text-xs">
+              <strong className="block text-white leading-tight">{currentUser?.name}</strong>
+              <span className="text-[10px] text-amber-400 uppercase font-black tracking-wider flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-amber-400" />
+                <span>{currentUser?.role === "superadmin" ? "Superadmin" : currentUser?.role}</span>
               </span>
             </div>
           </div>
 
-          {/* Superadmin Role Test Switcher */}
-          <div className="hidden lg:flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
-            <span className="text-[10px] text-slate-400 font-bold px-2">Uloga:</span>
-            {(["superadmin", "webadmin", "referent_nabavke", "referent_pr"] as UserRole[]).map((r) => (
-              <button
-                key={r}
-                onClick={() => switchRole(r)}
-                className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase transition ${
-                  currentRole === r ? "bg-sky-600 text-white shadow-sm" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                {r === "superadmin" ? "Super" : r === "webadmin" ? "Web" : r === "referent_nabavke" ? "Nabavke" : "PR"}
-              </button>
-            ))}
-          </div>
-
           <button
             onClick={handleLogout}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 border border-slate-700 transition"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 border border-slate-700 transition flex items-center gap-1.5 text-xs font-bold"
             title="Odjavi se"
           >
             <LogOut className="w-4 h-4" />
+            <span className="hidden sm:inline">Odjava</span>
           </button>
         </div>
       </header>
@@ -451,7 +548,7 @@ export default function AdminPortalPage() {
             }`}
           >
             <FileText className="w-4 h-4 text-emerald-400" />
-            <span>Javne nabavke ({tendersList.length})</span>
+            <span>Javne nabavke i oglasi ({tendersList.length})</span>
           </button>
 
           <button
@@ -463,8 +560,23 @@ export default function AdminPortalPage() {
             }`}
           >
             <ImageIcon className="w-4 h-4 text-indigo-400" />
-            <span>Komercijalni baneri</span>
+            <span>Komercijalni baneri ({bannersList.length})</span>
           </button>
+
+          {/* SUPERADMIN USER MANAGEMENT TAB */}
+          {currentUser?.role === "superadmin" && (
+            <button
+              onClick={() => setActiveTab("users")}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+                activeTab === "users"
+                  ? "bg-amber-600 text-white shadow-md shadow-amber-600/30"
+                  : "text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200"
+              }`}
+            >
+              <Users className="w-4 h-4 text-amber-500" />
+              <span>Korisnici i ovlašćenja ({adminUsers.length})</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -473,7 +585,6 @@ export default function AdminPortalPage() {
         {/* TAB 1: SURVEY ANALYTICS */}
         {activeTab === "surveys" && (
           <div className="space-y-6">
-            {/* Stats Overview */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                 <span className="text-[10px] font-black uppercase text-slate-400 block">Ukupna ocjena</span>
@@ -509,7 +620,6 @@ export default function AdminPortalPage() {
               </div>
             </div>
 
-            {/* Surveys Submissions Table */}
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-slate-200 flex items-center justify-between">
                 <div>
@@ -517,7 +627,7 @@ export default function AdminPortalPage() {
                   <p className="text-xs text-slate-500">Direktni komentari i ocjene pristigle putem ankete na web portalu</p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-200">
-                  {surveys.length} zabilježenih anketa
+                  {surveys.length} anketa
                 </span>
               </div>
 
@@ -570,16 +680,11 @@ export default function AdminPortalPage() {
               <div className="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-black text-slate-900">Evidencija rezervisanih flash kupona (50 ulazaka + 5 kafa)</h3>
-                  <p className="text-xs text-slate-500">Kupci koji su preuzeli digitalni vaučer i brojevi telefona evidentirani na biletarnici</p>
+                  <p className="text-xs text-slate-500">Brojevi telefona i vaučeri koji važe na biletarnici i u Caffe Baru GOB</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-                    Aktivni kuponi: {coupons.filter(c => c.status === "Aktivan").length}
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
-                    Ukupno: {coupons.length}
-                  </span>
-                </div>
+                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                  Aktivni: {coupons.filter(c => c.status === "Aktivan").length} / Ukupno: {coupons.length}
+                </span>
               </div>
 
               <div className="overflow-x-auto">
@@ -589,7 +694,6 @@ export default function AdminPortalPage() {
                       <th className="py-3 px-4">Kôd vaučera</th>
                       <th className="py-3 px-4">Broj telefona</th>
                       <th className="py-3 px-4">Datum & Vrijeme</th>
-                      <th className="py-3 px-4">Objekat</th>
                       <th className="py-3 px-4">Status</th>
                       <th className="py-3 px-4 text-right">Akcija</th>
                     </tr>
@@ -605,9 +709,6 @@ export default function AdminPortalPage() {
                         </td>
                         <td className="py-3 px-4 text-slate-500 font-medium">
                           {c.date}
-                        </td>
-                        <td className="py-3 px-4 text-slate-700 font-semibold">
-                          {c.facility}
                         </td>
                         <td className="py-3 px-4">
                           <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
@@ -635,14 +736,14 @@ export default function AdminPortalPage() {
           </div>
         )}
 
-        {/* TAB 3: KIDS DRAWINGS CONTEST */}
+        {/* TAB 3: KIDS DRAWINGS */}
         {activeTab === "drawings" && (
           <div className="space-y-6">
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-slate-200 flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-black text-slate-900">Prijave za dječiji konkurs „Nacrtaj Aquanu ili GOB“</h3>
-                  <p className="text-xs text-slate-500">Radovi pristigli za mjesečnu nagradu od 10 besplatnih ulaza</p>
+                  <p className="text-xs text-slate-500">Radovi pristigli za nagradu od 10 besplatnih ulaza</p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
                   {drawings.length} pristiglih radova
@@ -656,7 +757,7 @@ export default function AdminPortalPage() {
                       <th className="py-3 px-4">Autor & Uzrast</th>
                       <th className="py-3 px-4">Naziv crteža</th>
                       <th className="py-3 px-4">Telefon roditelja</th>
-                      <th className="py-3 px-4">Datum prijave</th>
+                      <th className="py-3 px-4">Datum</th>
                       <th className="py-3 px-4">Glasovi</th>
                       <th className="py-3 px-4">Status</th>
                     </tr>
@@ -673,12 +774,8 @@ export default function AdminPortalPage() {
                         <td className="py-3 px-4 font-mono font-bold text-sky-800">
                           {d.parentPhone}
                         </td>
-                        <td className="py-3 px-4 text-slate-500">
-                          {d.date}
-                        </td>
-                        <td className="py-3 px-4 font-black text-amber-600">
-                          ★ {d.votes} glasova
-                        </td>
+                        <td className="py-3 px-4 text-slate-500">{d.date}</td>
+                        <td className="py-3 px-4 font-black text-amber-600">★ {d.votes} glasova</td>
                         <td className="py-3 px-4">
                           <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                             {d.status}
@@ -701,13 +798,6 @@ export default function AdminPortalPage() {
                 <h3 className="text-lg font-black text-slate-900">Upravljanje vijestima i saopštenjima</h3>
                 <p className="text-xs text-slate-500">Objave na naslovnoj strani i u arhivi vijesti</p>
               </div>
-              <button
-                onClick={() => setShowAddNewsModal(true)}
-                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Dodaj novu vijest</span>
-              </button>
             </div>
 
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -750,40 +840,83 @@ export default function AdminPortalPage() {
           </div>
         )}
 
-        {/* TAB 5: TENDERS */}
+        {/* TAB 5: TENDERS & PUBLIC ANNOUNCEMENTS */}
         {activeTab === "tenders" && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h3 className="text-lg font-black text-slate-900">Javne nabavke i tenderska dokumentacija</h3>
-                <p className="text-xs text-slate-500">Zvanični registar tendera JP „Aquana“ d.o.o. Banja Luka</p>
+                <h3 className="text-lg font-black text-slate-900">Javne nabavke, tenderi i javni oglasi</h3>
+                <p className="text-xs text-slate-500">
+                  Dodavanje novih tendera, promjena statusa i brisanje (brisanje dozvoljeno samo Superadminu)
+                </p>
               </div>
+              <button
+                onClick={() => setShowAddTenderModal(true)}
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Objavi novu nabavku / oglas</span>
+              </button>
             </div>
 
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
-                    <th className="py-3 px-4">Broj nabavke</th>
-                    <th className="py-3 px-4">Predmet nabavke</th>
+                    <th className="py-3 px-4">R.Br / ID</th>
+                    <th className="py-3 px-4">Predmet nabavke / Naziv oglasa</th>
                     <th className="py-3 px-4">Godina</th>
+                    <th className="py-3 px-4">Datum objave</th>
                     <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Akcije</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {tendersList.map((t) => (
                     <tr key={t.id} className="hover:bg-slate-50 transition">
                       <td className="py-3 px-4 font-mono font-bold text-slate-900">JN-{t.id}</td>
-                      <td className="py-3 px-4 font-semibold text-slate-800">{t.title}</td>
-                      <td className="py-3 px-4 font-mono text-slate-500">{t.year}</td>
+                      <td className="py-3 px-4 font-semibold text-slate-800 max-w-md">
+                        {t.title}
+                        <span className="block text-[10px] text-slate-400 font-mono mt-0.5">Dokument: {t.file}</span>
+                      </td>
+                      <td className="py-3 px-4 font-mono text-slate-600">{t.year}</td>
+                      <td className="py-3 px-4 text-slate-500">{t.date}</td>
                       <td className="py-3 px-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          t.status === "Aktivno"
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-slate-200 text-slate-700"
-                        }`}>
-                          {t.status}
-                        </span>
+                        <button
+                          onClick={() => toggleTenderStatus(t.id)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-black transition cursor-pointer ${
+                            t.status === "Aktivno"
+                              ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300"
+                              : t.status === "Dodijeljen ugovor"
+                              ? "bg-sky-100 text-sky-800 hover:bg-sky-200 border border-sky-300"
+                              : t.status === "Poništeno"
+                              ? "bg-rose-100 text-rose-800 hover:bg-rose-200 border border-rose-300"
+                              : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                          }`}
+                          title="Kliknite za promjenu statusa"
+                        >
+                          ● {t.status}
+                        </button>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => toggleTenderStatus(t.id)}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700"
+                            title="Promijeni status"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
+                          {currentUser?.role === "superadmin" && (
+                            <button
+                              onClick={() => deleteTender(t.id)}
+                              className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition"
+                              title="Obriši nabavku (samo Superadmin)"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -793,37 +926,479 @@ export default function AdminPortalPage() {
           </div>
         )}
 
-        {/* TAB 6: BANNERS */}
+        {/* TAB 6: COMMERCIAL BANNERS & SPONSOR SLOTS SPECIFICATION */}
         {activeTab === "banners" && (
           <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-black text-slate-900">Komercijalni baneri i sponzorski slotovi</h3>
-              <p className="text-xs text-slate-500">Upravljanje zakupljenim oglasnim prostorom na portalu</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Komercijalni baneri i sponzorski slotovi</h3>
+                <p className="text-xs text-slate-500">
+                  Pregled pozicija, dimenzija, statusa i upravljanje zakupljenim prostorom
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddBannerModal(true)}
+                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Dodaj novi baner</span>
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {commercialBanners.map((b) => (
-                <div key={b.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-                  <div className="flex items-center justify-between">
-                    <strong className="text-slate-900 text-sm">{b.client}</strong>
-                    <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">
-                      Aktivan
-                    </span>
+            {/* BANNER SPECIFICATION CARDS FOR CLIENT PROPOSALS */}
+            <div className="bg-gradient-to-r from-slate-900 to-indigo-950 p-6 rounded-3xl text-white space-y-4 shadow-xl border border-indigo-500/30">
+              <div className="flex items-center gap-2 text-indigo-300 text-xs font-black uppercase tracking-wider">
+                <Info className="w-4 h-4 text-cyan-400" />
+                <span>CJENOVNIK I SPECIFIKACIJA OGLASNIH POZICIJA ZA ZAKUPCE</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {(Object.entries(BANNER_SLOTS) as [BannerPosition, typeof BANNER_SLOTS[BannerPosition]][]).map(([key, slot]) => (
+                  <div key={key} className="bg-white/10 rounded-2xl p-4 border border-white/10 space-y-2 backdrop-blur-sm">
+                    <span className="text-[10px] font-black uppercase text-cyan-300 block">{slot.title.split(":")[0]}</span>
+                    <strong className="text-sm font-bold text-white block leading-snug">{slot.title.split(":")[1]}</strong>
+                    <div className="bg-black/30 px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-amber-300 inline-block border border-amber-300/30">
+                      📐 {slot.dimensions}
+                    </div>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">{slot.description}</p>
+                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs font-black text-emerald-400">
+                      <span>Preporučena cijena:</span>
+                      <span>{slot.recommendedPrice}</span>
+                    </div>
                   </div>
-                  <div className="h-28 rounded-xl overflow-hidden bg-slate-100">
-                    <img src={b.image} alt={b.client} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="text-xs text-slate-500 flex justify-between font-mono">
-                    <span>Pozicija: {b.position}</span>
-                    <span>Do: {b.validTo}</span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* LIVE BANNERS TABLE */}
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+                <h4 className="text-base font-black text-slate-900">Aktivni i arhivirani sponzorski baneri</h4>
+                <span className="text-xs text-slate-500 font-semibold">{bannersList.length} banera</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                      <th className="py-3 px-4">Klijent / Zakupac</th>
+                      <th className="py-3 px-4">Pozicija & Dimenzije</th>
+                      <th className="py-3 px-4">Period zakupa</th>
+                      <th className="py-3 px-4">Cijena</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4 text-right">Akcije</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {bannersList.map((b) => (
+                      <tr key={b.id} className="hover:bg-slate-50 transition">
+                        <td className="py-3 px-4">
+                          <strong className="text-slate-900 text-sm block">{b.client}</strong>
+                          <a href={b.link} target="_blank" className="text-[11px] text-sky-600 hover:underline flex items-center gap-1 font-mono">
+                            <span>{b.link}</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-bold text-[10px] block w-fit mb-1 border border-indigo-200">
+                            {b.position}
+                          </span>
+                          <span className="font-mono text-slate-500 text-[11px]">{b.dimensions}</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-slate-600">
+                          {b.validFrom} – {b.validTo}
+                        </td>
+                        <td className="py-3 px-4 font-bold text-emerald-700 font-mono">
+                          {b.priceNote || "Ugovor"}
+                        </td>
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => toggleBannerStatus(b.id)}
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-black transition cursor-pointer ${
+                              b.status === "Aktivan"
+                                ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                : "bg-slate-200 text-slate-700"
+                            }`}
+                          >
+                            ● {b.status}
+                          </button>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => toggleBannerStatus(b.id)}
+                              className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold"
+                            >
+                              {b.status === "Aktivan" ? "Deaktiviraj" : "Aktiviraj"}
+                            </button>
+                            <button
+                              onClick={() => deleteBanner(b.id)}
+                              className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition"
+                              title="Obriši baner"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 7: USER MANAGEMENT (SUPERADMIN ONLY) */}
+        {activeTab === "users" && currentUser?.role === "superadmin" && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Upravljanje korisnicima i ovlašćenjima (Superadmin)</h3>
+                <p className="text-xs text-slate-500">
+                  Dodjela pristupa, definisanje korisničkih imena, lozinki i uloga za rad u CMS sistemu
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddUserModal(true)}
+                className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Dodaj novog korisnika</span>
+              </button>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                    <th className="py-3 px-4">Korisničko ime</th>
+                    <th className="py-3 px-4">Ime i Prezime</th>
+                    <th className="py-3 px-4">Lozinka</th>
+                    <th className="py-3 px-4">Uloga / Ovlašćenje</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Akcije</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {adminUsers.map((u) => (
+                    <tr key={u.id} className="hover:bg-slate-50 transition">
+                      <td className="py-3 px-4 font-mono font-bold text-slate-900 text-sm">
+                        {u.username}
+                        {u.username === "sinisa" && (
+                          <span className="ml-2 px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[9px] font-black">
+                            MASTER
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        <strong className="text-slate-900 text-sm block">{u.name}</strong>
+                        <span className="text-[11px] text-slate-500">{u.title}</span>
+                      </td>
+                      <td className="py-3 px-4 font-mono font-bold text-slate-700">
+                        {u.password}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                          u.role === "superadmin"
+                            ? "bg-amber-100 text-amber-900 border border-amber-300"
+                            : u.role === "webadmin"
+                            ? "bg-sky-100 text-sky-900 border border-sky-300"
+                            : u.role === "referent_nabavke"
+                            ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                            : "bg-purple-100 text-purple-900 border border-purple-300"
+                        }`}>
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          u.status === "Aktivan" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                        }`}>
+                          {u.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {u.username !== "sinisa" && (
+                            <>
+                              <button
+                                onClick={() => toggleUserStatus(u.id)}
+                                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold"
+                              >
+                                {u.status === "Aktivan" ? "Blokiraj" : "Aktiviraj"}
+                              </button>
+                              <button
+                                onClick={() => deleteUser(u.id, u.username)}
+                                className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition"
+                                title="Obriši nalog"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
       </main>
+
+      {/* MODAL 1: ADD USER (Superadmin only) */}
+      {showAddUserModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-4">
+            <h3 className="text-xl font-black text-slate-900">Dodaj novog korisnika CMS-a</h3>
+            <form onSubmit={handleAddUser} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Korisničko ime (username):</label>
+                <input
+                  type="text"
+                  required
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  placeholder="npr. jovan.p"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Lozinka (password):</label>
+                <input
+                  type="text"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Unesite lozinku..."
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Ime i Prezime zaposlenog:</label>
+                <input
+                  type="text"
+                  required
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="npr. Jovan Petrović"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Uloga / Nivo ovlašćenja:</label>
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value as UserRole)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white font-bold"
+                >
+                  <option value="webadmin">Webadmin – Urednik sadržaja i vijesti</option>
+                  <option value="referent_nabavke">Referent nabavki – Javne nabavke i tenderi</option>
+                  <option value="referent_pr">PR Referent – Marketing, kuponi, dječiji konkurs</option>
+                  <option value="superadmin">Superadmin – Puni pristup sistemu</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddUserModal(false)}
+                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase"
+                >
+                  Odustani
+                </button>
+                <button
+                  type="submit"
+                  className="w-1/2 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-black text-xs uppercase shadow-md"
+                >
+                  Kreiraj nalog
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: ADD BANNER */}
+      {showAddBannerModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-4">
+            <h3 className="text-xl font-black text-slate-900">Dodaj komercijalni / sponzorski baner</h3>
+            <form onSubmit={handleAddBanner} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Naziv klijenta / partnera:</label>
+                <input
+                  type="text"
+                  required
+                  value={newBannerClient}
+                  onChange={(e) => setNewBannerClient(e.target.value)}
+                  placeholder="npr. Banjalučka pivara / Nektar"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Pozicija i format banera:</label>
+                <select
+                  value={newBannerPosition}
+                  onChange={(e) => {
+                    const pos = e.target.value as BannerPosition;
+                    setNewBannerPosition(pos);
+                    setNewBannerPrice(BANNER_SLOTS[pos].recommendedPrice);
+                  }}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white font-bold"
+                >
+                  <option value="top_spotlight">Pozicija A: Header Billboard (1200 x 160 px)</option>
+                  <option value="inter_section">Pozicija B: Panorama između sekcija (1280 x 240 px)</option>
+                  <option value="sidebar">Pozicija C: Sidebar Skyscraper (360 x 500 px)</option>
+                  <option value="footer_strip">Pozicija D: Footer Partner Strip (1200 x 100 px)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Web link klijenta (URL):</label>
+                <input
+                  type="url"
+                  required
+                  value={newBannerLink}
+                  onChange={(e) => setNewBannerLink(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Važi od:</label>
+                  <input
+                    type="text"
+                    value={newBannerValidFrom}
+                    onChange={(e) => setNewBannerValidFrom(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Važi do:</label>
+                  <input
+                    type="text"
+                    value={newBannerValidTo}
+                    onChange={(e) => setNewBannerValidTo(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Ugovorena naknada:</label>
+                <input
+                  type="text"
+                  value={newBannerPrice}
+                  onChange={(e) => setNewBannerPrice(e.target.value)}
+                  placeholder="npr. 400 KM/mj"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddBannerModal(false)}
+                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase"
+                >
+                  Odustani
+                </button>
+                <button
+                  type="submit"
+                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase shadow-md"
+                >
+                  Sačuvaj baner
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: ADD TENDER */}
+      {showAddTenderModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-4">
+            <h3 className="text-xl font-black text-slate-900">Objavi novu javnu nabavku / oglas</h3>
+            <form onSubmit={handleAddTender} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Predmet nabavke / Naziv oglasa:</label>
+                <textarea
+                  required
+                  rows={2}
+                  value={newTenderTitle}
+                  onChange={(e) => setNewTenderTitle(e.target.value)}
+                  placeholder="npr. Nabavka hemijskih sredstava za sanitarni tretman vode 2026..."
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Godina:</label>
+                  <select
+                    value={newTenderYear}
+                    onChange={(e) => setNewTenderYear(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 font-bold"
+                  >
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Status:</label>
+                  <select
+                    value={newTenderStatus}
+                    onChange={(e) => setNewTenderStatus(e.target.value as TenderItem["status"])}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 font-bold"
+                  >
+                    <option value="Aktivno">Aktivno</option>
+                    <option value="Dodijeljen ugovor">Dodijeljen ugovor</option>
+                    <option value="Završeno">Završeno</option>
+                    <option value="Poništeno">Poništeno</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Naziv PDF dokumenta:</label>
+                <input
+                  type="text"
+                  value={newTenderFile}
+                  onChange={(e) => setNewTenderFile(e.target.value)}
+                  placeholder="npr. Odluka-o-izboru-2026.pdf"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 font-mono"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddTenderModal(false)}
+                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase"
+                >
+                  Odustani
+                </button>
+                <button
+                  type="submit"
+                  className="w-1/2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase shadow-md"
+                >
+                  Objavi nabavku
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

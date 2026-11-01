@@ -697,3 +697,21 @@ export const initialTenders: TenderItem[] = [
     "file": "Pregovaracki-postupak-bez-objave-obavjestenja-elektricna-energija.pdf"
   }
 ];
+
+export const getStoredTenders = (): TenderItem[] => {
+  if (typeof window === "undefined") return initialTenders;
+  try {
+    const raw = localStorage.getItem("aquana_stored_tenders");
+    if (!raw) return initialTenders;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialTenders;
+  } catch {
+    return initialTenders;
+  }
+};
+
+export const saveStoredTenders = (tenders: TenderItem[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aquana_stored_tenders", JSON.stringify(tenders));
+  }
+};
