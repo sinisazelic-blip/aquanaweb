@@ -195,7 +195,7 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
 
           {/* 3. WebShop / Karte (Narandžasto, veće dugme: shop.aquana.ba) */}
           <a
-            href="https://shop.aquana.ba"
+            href="https://karte.aquana.ba"
             target="_blank"
             rel="noopener noreferrer"
             title="Online kupovina karata i sezonskih propusnica"
@@ -317,7 +317,7 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
           )}
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             <a
-              href="https://shop.aquana.ba"
+              href="https://karte.aquana.ba"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
