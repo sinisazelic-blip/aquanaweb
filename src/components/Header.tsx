@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { Lang, translations, saveLang } from "@/lib/translations";
-import { Search, Menu, X, ShieldCheck, Phone, Facebook, Instagram, Youtube, FileText, Droplet, Tag, Newspaper, Mail } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { Search, Menu, X, ShieldCheck, Phone, Facebook, Instagram, Youtube, FileText, Droplet, Tag, Newspaper, Mail, Users, Building2, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
 interface HeaderProps {
@@ -14,12 +15,16 @@ interface HeaderProps {
   setSearchQuery?: (q: string) => void;
 }
 
-export default function Header({ currentLang, setLang, onOpenSurvey, onOpenContact, searchQuery, setSearchQuery }: HeaderProps) {
+export default function Header({ currentLang: propLang, setLang: propSetLang, onOpenSurvey, onOpenContact, searchQuery, setSearchQuery }: Partial<HeaderProps>) {
+  const langCtx = useLanguage();
+  const currentLang = propLang || langCtx.currentLang;
+  const setLang = propSetLang || langCtx.setLang;
   const t = translations[currentLang];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLanguageChange = (lang: Lang) => {
-    setLang(lang);
+    langCtx.setLang(lang);
+    if (propSetLang) propSetLang(lang);
     saveLang(lang);
   };
 
@@ -95,6 +100,7 @@ export default function Header({ currentLang, setLang, onOpenSurvey, onOpenConta
               >
                 LAT
               </button>
+              {false && (
               <button
                 onClick={() => handleLanguageChange('en')}
                 className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition cursor-pointer ${
@@ -103,6 +109,7 @@ export default function Header({ currentLang, setLang, onOpenSurvey, onOpenConta
               >
                 EN
               </button>
+              )}
             </div>
           </div>
         </div>
@@ -208,6 +215,7 @@ export default function Header({ currentLang, setLang, onOpenSurvey, onOpenConta
               >
                 LAT
               </button>
+              {false && (
               <button
                 onClick={() => handleLanguageChange('en')}
                 className={`px-3 py-1 rounded-full text-xs font-black transition cursor-pointer ${
@@ -216,6 +224,7 @@ export default function Header({ currentLang, setLang, onOpenSurvey, onOpenConta
               >
                 EN
               </button>
+              )}
             </div>
           </div>
 
@@ -264,7 +273,7 @@ export default function Header({ currentLang, setLang, onOpenSurvey, onOpenConta
           <button
             onClick={() => {
               setMobileMenuOpen(false);
-              onOpenSurvey();
+              onOpenSurvey?.();
             }}
             className="block w-full text-left font-bold text-amber-600 py-1 cursor-pointer"
           >
@@ -274,7 +283,7 @@ export default function Header({ currentLang, setLang, onOpenSurvey, onOpenConta
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenContact();
+                onOpenContact?.();
               }}
               className="block w-full text-left font-bold text-sky-700 py-1 cursor-pointer"
             >

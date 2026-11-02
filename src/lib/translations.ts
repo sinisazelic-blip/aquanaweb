@@ -12,7 +12,9 @@ export const translations = {
       survey: "Анкета грађана",
       contact: "Контакт",
       portal: "Aquana Портал",
-      b2b: "B2B / Клубови",
+      b2b: "B2B Портал",
+      klubovi: "Клубови",
+      webshop: "WebShop",
     },
     hero: {
       badge: "ЈАВНО ПРЕДУЗЕЋЕ „AQUANA“ БАЊА ЛУКА",
@@ -73,7 +75,9 @@ export const translations = {
       survey: "Anketa građana",
       contact: "Kontakt",
       portal: "Aquana Portal",
-      b2b: "B2B / Klubovi",
+      b2b: "B2B Portal",
+      klubovi: "Klubovi",
+      webshop: "WebShop",
     },
     hero: {
       badge: "JAVNO PREDUZEĆE „AQUANA“ BANJA LUKA",
@@ -134,7 +138,9 @@ export const translations = {
       survey: "Citizens Survey",
       contact: "Contact",
       portal: "Aquana Portal",
-      b2b: "B2B / Clubs",
+      b2b: "B2B Portal",
+      klubovi: "Clubs",
+      webshop: "WebShop",
     },
     hero: {
       badge: "PUBLIC ENTERPRISE „AQUANA“ BANJA LUKA",
@@ -207,16 +213,25 @@ export function toCyrillic(text: string): string {
   if (!text) return "";
   let res = text;
   
-  // Custom brand & common terms
-  res = res.replace(/\bAquana\b/g, "Аквана")
-           .replace(/\bAQUANA\b/g, "АКВАНА")
-           .replace(/\baquana\b/g, "аквана")
-           .replace(/\bCaffe\b/g, "Кафе")
-           .replace(/\bcaffe\b/g, "кафе")
-           .replace(/\bFitness\b/g, "Фитнес")
-           .replace(/\bfitness\b/g, "фитнес")
-           .replace(/\bParking\b/g, "Паркинг")
-           .replace(/\bparking\b/g, "паркинг");
+  // Protected brands & English terms that must stay in Latin
+  const protectedWords = [
+    "Facebook", "Instagram", "YouTube", "TikTok", "Twitter",
+    "AquaStar", "Aquana", "AQUANA", "aquana",
+    "PK Olymp", "Olymp", "APK 22. April", "PK Borac", "PK Delfin", "PK Kruna",
+    "RK BUK", "VK Banja Luka", "VK Borac", "VK Incel",
+    "FINA", "WiFi", "Wi-Fi", "Caffe", "caffe", "Fitness", "fitness",
+    "Parking", "parking", "B2B", "CMS", "PDF", "Email", "email", "Online", "online"
+  ];
+  protectedWords.sort((a, b) => b.length - a.length);
+
+  const placeholders: { key: string; val: string }[] = [];
+  protectedWords.forEach((word, idx) => {
+    if (res.includes(word)) {
+      const key = `__#${idx}#__`;
+      placeholders.push({ key, val: word });
+      res = res.split(word).join(key);
+    }
+  });
 
   const digraphs: [string, string][] = [
     ["Dž", "Џ"], ["DŽ", "Џ"], ["dž", "џ"],
@@ -234,7 +249,17 @@ export function toCyrillic(text: string): string {
     J: "Ј", K: "К", L: "Л", M: "М", N: "Н", O: "О", P: "П", R: "Р", S: "С", T: "Т",
     Ć: "Ћ", U: "У", F: "Ф", H: "Х", C: "Ц", Č: "Ч", Š: "Ш",
   };
-  return res.replace(/[a-zA-ZčćžšđČĆŽŠĐ]/g, (ch) => singleMap[ch] || ch);
+  res = res.replace(/[a-zA-ZčćžšđČĆŽŠĐ]/g, (ch) => singleMap[ch] || ch);
+
+  placeholders.forEach(({ key, val }) => {
+    res = res.split(key).join(val);
+    const legacyCyr = key.replace("__#", "@@ПРОТ_").replace("#__", "@@");
+    const legacyLat = key.replace("__#", "@@PROT_").replace("#__", "@@");
+    if (res.includes(legacyCyr)) res = res.split(legacyCyr).join(val);
+    if (res.includes(legacyLat)) res = res.split(legacyLat).join(val);
+  });
+
+  return res;
 }
 
 export function tr(text: string, lang: Lang): string {
