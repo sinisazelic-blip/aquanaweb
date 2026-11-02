@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Lang } from "@/lib/translations";
+import { Lang, tr } from "@/lib/translations";
 import liveData from "@/lib/livePoolManagerSchedule.json";
 import { Clock, Calendar, CheckCircle2, Users, Sparkles, Waves, ShieldCheck, Database, Award, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +11,12 @@ interface InteractiveScheduleProps {
 }
 
 export default function InteractiveSchedule({ currentLang }: InteractiveScheduleProps) {
+  const t = (s: string) => tr(s, currentLang);
+  const getDayName = (d: { lat: string; cir: string; en: string }) => {
+    if (currentLang === "cir") return d.cir;
+    if (currentLang === "en") return d.en;
+    return d.lat;
+  };
   // Days of week 0 = Ponedjeljak ... 6 = Nedjelja
   const [selectedDay, setSelectedDay] = useState<number>(0);
   const [selectedPoolName, setSelectedPoolName] = useState<string>("Veliki"); // "Veliki" or "Mali"
@@ -77,13 +83,13 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30">
               <Database className="w-3.5 h-3.5 text-cyan-400" />
-              <span>DIREKTNA SINHRONIZACIJA SA BAZOM POOL MANAGERA GOB-a</span>
+              <span>{t("DIREKTNA SINHRONIZACIJA SA BAZOM POOL MANAGERA GOB-a")}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-              Stvarni raspored i popunjenost bazenskih staza
+              {t("Stvarni raspored i popunjenost bazenskih staza")}
             </h2>
             <p className="text-slate-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Zvanična matrica zauzeća staza za 10 plivačkih i vaterpolo klubova. Prije polaska na bazen provjerite u kojim terminima je slobodno rekreativno plivanje za građanstvo.
+              {t("Zvanična matrica zauzeća staza za 10 plivačkih i vaterpolo klubova. Prije polaska na bazen provjerite u kojim terminima je slobodno rekreativno plivanje za građanstvo.")}
             </p>
           </div>
 
@@ -97,7 +103,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                   : "text-slate-300 hover:text-white"
               }`}
             >
-              Veliki olimpijski (50m • 10 staza)
+              {t("Veliki olimpijski (50m • 10 staza)")}
             </button>
             <button
               onClick={() => setSelectedPoolName("Mali")}
@@ -107,7 +113,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                   : "text-slate-300 hover:text-white"
               }`}
             >
-              Mali bazen (25m • 5 staza)
+              {t("Mali bazen (25m • 5 staza)")}
             </button>
           </div>
         </div>
@@ -125,7 +131,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>{d.lat}</span>
+              <span>{getDayName(d)}</span>
             </button>
           ))}
         </div>
@@ -161,8 +167,8 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                       <h4 className="font-black text-white text-base">{slot.label}</h4>
                       <span className="text-[11px] text-slate-400">
                         {freeLanesCount > 0
-                          ? `Dostupno ${freeLanesCount} slobodnih staza za građane i rekreativce`
-                          : "Sve staze zauzete trenažnim procesom klubova"}
+                          ? t(`Dostupno ${freeLanesCount} slobodnih staza za građane i rekreativce`)
+                          : t("Sve staze zauzete trenažnim procesom klubova")}
                       </span>
                     </div>
                   </div>
@@ -175,7 +181,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                           : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
                       }`}
                     >
-                      {freeLanesCount > 0 ? `Slobodno: ${freeLanesCount}/${maxLanes} staza` : "Klupski termin"}
+                      {freeLanesCount > 0 ? t(`Slobodno: ${freeLanesCount}/${maxLanes} staza`) : t("Klupski termin")}
                     </span>
                   </div>
                 </div>
@@ -206,7 +212,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                               {allocation.club}
                             </strong>
                             <span className="text-[9px] text-slate-400 block font-semibold">
-                              {allocation.billing === "JI" ? "Javni interes" : "Komercijalno"}
+                              {t(allocation.billing === "JI" ? "Javni interes" : "Komercijalno")}
                             </span>
                           </div>
                         ) : (
@@ -219,7 +225,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                         )}
 
                         <span className="text-[9px] font-mono text-slate-500 mt-1 block">
-                          {allocation ? "Zauzeto" : "Slobodno"}
+                          {t(allocation ? "Zauzeto" : "Slobodno")}
                         </span>
                       </div>
                     );
@@ -238,8 +244,8 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
           >
             <span>
               {isExpanded
-                ? "▲ Skupi raspored (prikaži samo aktuelne termine)"
-                : `▼ Prikaži kompletan cjelodnevni raspored za ${dayNames[selectedDay].lat} (još ${timeSlots.length - 2} termina do 22:00h)`}
+                ? t("▲ Skupi raspored (prikaži samo aktuelne termine)")
+                : t(`▼ Prikaži kompletan cjelodnevni raspored za ${getDayName(dayNames[selectedDay])} (još ${timeSlots.length - 2} termina do 22:00h)`)}
             </span>
             <ChevronDown
               className={`w-5 h-5 text-sky-300 transition-transform duration-300 ${
@@ -254,11 +260,11 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
           <div className="flex flex-wrap items-center gap-6">
             <span className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-md bg-emerald-500"></span>
-              <strong>Zeleno:</strong> Slobodne staze za rekreativno plivanje građana
+              <strong>{t("Zeleno:")}</strong> {t("Slobodne staze za rekreativno plivanje građana")}
             </span>
             <span className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-md bg-sky-500"></span>
-              <strong>Plavo:</strong> Trenažni termini licenciranih klubova (APK 22. April, PK Olymp, PK Borac...)
+              <strong>{t("Plavo:")}</strong> {t("Trenažni termini licenciranih klubova (APK 22. April, PK Olymp, PK Borac...)")}
             </span>
           </div>
 
@@ -267,7 +273,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
               href="/cjenovnik"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-400 hover:text-sky-300 transition"
             >
-              <span>Pregledaj cijene ulaznica</span>
+              <span>{t("Pregledaj cijene ulaznica")}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

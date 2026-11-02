@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
-import { Lang } from "@/lib/translations";
+import { Lang, tr } from "@/lib/translations";
 import { realClubs } from "@/lib/realPoolData";
 import { Droplets, Thermometer, Clock, Activity, ShieldCheck, Users, Award, Radio } from "lucide-react";
 
@@ -11,6 +11,7 @@ interface PoolLiveStatusProps {
 
 export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
   const [activeRadar, setActiveRadar] = useState<"gob" | "vp">("gob");
+  const t = (s: string) => tr(s, currentLang);
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-sky-900/5 border border-sky-100 relative overflow-hidden">
@@ -22,15 +23,15 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold mb-2 border border-emerald-200/60">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>UŽIVO POPUNJENOST & TELEMETRIJA</span>
+            <span>{t("UŽIVO POPUNJENOST & TELEMETRIJA")}</span>
           </div>
 
           <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
             <Activity className="w-7 h-7 text-sky-500" />
-            <span>Radar popunjenosti bazena u realnom vremenu</span>
+            <span>{t("Radar popunjenosti bazena u realnom vremenu")}</span>
           </h3>
           <p className="text-slate-500 text-sm mt-1">
-            Zvanični podaci direktno sa elektronske kontrole prolaza i tripoda na ulazima.
+            {t("Zvanični podaci direktno sa elektronske kontrole prolaza i tripoda na ulazima.")}
           </p>
         </div>
 
@@ -44,7 +45,7 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            GOB (Plivači u vodi)
+            {t("GOB (Plivači u vodi)")}
           </button>
           <button
             onClick={() => setActiveRadar("vp")}
@@ -54,7 +55,7 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            Vodeni park (Sezona)
+            {t("Vodeni park (Sezona)")}
           </button>
         </div>
       </div>
@@ -66,7 +67,7 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
           <div className="w-full flex items-center justify-between pb-3 border-b border-sky-200 text-xs">
             <span className="flex items-center gap-1.5 font-extrabold text-sky-900">
               <Radio className="w-4 h-4 animate-pulse text-sky-600" />
-              <span>{activeRadar === "gob" ? "Radar GOB: Broj plivača u vodi" : "Radar VP: Posjećenost (Ljetna sezona)"}</span>
+              <span>{activeRadar === "gob" ? t("Radar GOB: Broj plivača u vodi") : t("Radar VP: Posjećenost (Ljetna sezona)")}</span>
             </span>
             <span className="text-[11px] text-sky-700 font-mono font-bold bg-sky-100/80 px-2 py-0.5 rounded-md border border-sky-200">ulazi.aquana.ba</span>
           </div>
@@ -76,7 +77,7 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
             <div className="w-full flex items-center justify-center py-2">
               <iframe
                 src="https://ulazi.aquana.ba/widget/occupancy"
-                title="Trenutna popunjenost - JP Aquana"
+                title={t("Trenutna popunjenost - JP Aquana")}
                 width="340"
                 height="340"
                 scrolling="no"
@@ -88,16 +89,16 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
               <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
                 <Clock className="w-8 h-8" />
               </div>
-              <h4 className="text-lg font-black text-slate-900">Vodeni park – Van sezone</h4>
+              <h4 className="text-lg font-black text-slate-900">{t("Vodeni park – Van sezone")}</h4>
               <p className="text-xs text-slate-600 max-w-xs font-medium">
-                Tripodi i radar vodenog parka na kapijama Borik se automatski aktiviraju sa početkom ljetne kupališne sezone 2026.
+                {t("Tripodi i radar vodenog parka na kapijama Borik se automatski aktiviraju sa početkom ljetne kupališne sezone 2026.")}
               </p>
             </div>
           )}
 
           <div className="w-full text-center pt-2 border-t border-sky-200 text-[11px] text-sky-800 font-semibold flex items-center justify-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>Automatsko osvježavanje sa sistema tripoda GOB-a</span>
+            <span>{t("Automatsko osvježavanje sa sistema tripoda GOB-a")}</span>
           </div>
         </div>
 
@@ -110,9 +111,9 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
                 <Droplets className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] text-slate-500 font-bold uppercase">Temperatura vode</p>
+                <p className="text-[11px] text-slate-500 font-bold uppercase">{t("Temperatura vode")}</p>
                 <p className="text-2xl font-black text-slate-900">26.8 °C</p>
-                <span className="text-[10px] text-emerald-600 font-bold">FINA takmičarska norma</span>
+                <span className="text-[10px] text-emerald-600 font-bold">{t("FINA takmičarska norma")}</span>
               </div>
             </div>
 
@@ -122,9 +123,9 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
                 <Thermometer className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] text-slate-500 font-bold uppercase">Temperatura dvorane</p>
+                <p className="text-[11px] text-slate-500 font-bold uppercase">{t("Temperatura dvorane")}</p>
                 <p className="text-2xl font-black text-slate-900">28.5 °C</p>
-                <span className="text-[10px] text-sky-600 font-bold">Klimatizovana dvorana</span>
+                <span className="text-[10px] text-sky-600 font-bold">{t("Klimatizovana dvorana")}</span>
               </div>
             </div>
 
@@ -134,9 +135,9 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] text-slate-500 font-bold uppercase">Olimpijski bazen</p>
+                <p className="text-[11px] text-slate-500 font-bold uppercase">{t("Olimpijski bazen")}</p>
                 <p className="text-2xl font-black text-slate-900">50 × 25 m</p>
-                <span className="text-[10px] text-slate-500 font-semibold">10 takmičarskih staza</span>
+                <span className="text-[10px] text-slate-500 font-semibold">{t("10 takmičarskih staza")}</span>
               </div>
             </div>
 
@@ -146,9 +147,9 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] text-slate-500 font-bold uppercase">Radno vrijeme</p>
+                <p className="text-[11px] text-slate-500 font-bold uppercase">{t("Radno vrijeme")}</p>
                 <p className="text-xl font-black text-slate-900">06:00 – 22:00h</p>
-                <span className="text-[10px] text-slate-500 font-semibold">Vikendom od 07:00h</span>
+                <span className="text-[10px] text-slate-500 font-semibold">{t("Vikendom od 07:00h")}</span>
               </div>
             </div>
           </div>
@@ -156,8 +157,8 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
           <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200/80 flex items-start gap-3">
             <Users className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" />
             <div className="text-xs text-slate-700">
-              <strong className="text-slate-900 block font-bold">Kako radi brojač kupača:</strong>
-              <span>Tripodi na ulazima 1 i 2 automatski bilježe svaki ulazak i izlazak kupača sa bazena. Podaci se u realnom vremenu prenose na ovaj radar, omogućavajući građanima da prije dolaska provjere trenutnu zauzetost staza.</span>
+              <strong className="text-slate-900 block font-bold">{t("Kako radi brojač kupača:")}</strong>
+              <span>{t("Tripodi na ulazima 1 i 2 automatski bilježe svaki ulazak i izlazak kupača sa bazena. Podaci se u realnom vremenu prenose na ovaj radar, omogućavajući građanima da prije dolaska provjere trenutnu zauzetost staza.")}</span>
             </div>
           </div>
         </div>
@@ -168,9 +169,9 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <span className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
             <Award className="w-4 h-4 text-sky-600" />
-            <span>Zvanični klubovi korisnici GOB-a (Plivanje, Vaterpolo, Ronjenje):</span>
+            <span>{t("Zvanični klubovi korisnici GOB-a (Plivanje, Vaterpolo, Ronjenje):")}</span>
           </span>
-          <span className="text-xs text-slate-400 font-semibold">10 registrovanih klubova u sistemu</span>
+          <span className="text-xs text-slate-400 font-semibold">{t("10 registrovanih klubova u sistemu")}</span>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -178,9 +179,9 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
             <span
               key={club.id}
               className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-sky-100 text-slate-800 hover:text-sky-900 text-xs font-bold border border-slate-200 transition"
-              title={`${club.name} (${club.typeLabel})`}
+              title={`${t(club.name)} (${t(club.typeLabel)})`}
             >
-              {club.shortName}
+              {t(club.shortName)}
             </span>
           ))}
         </div>

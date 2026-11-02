@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Lang, tr } from "@/lib/translations";
 import {
   Coffee,
   Flame,
@@ -30,9 +31,11 @@ import {
 
 interface FlashPromoActionProps {
   onOpenGame: () => void;
+  currentLang?: Lang;
 }
 
-export default function FlashPromoAction({ onOpenGame }: FlashPromoActionProps) {
+export default function FlashPromoAction({ onOpenGame, currentLang = "lat" }: FlashPromoActionProps) {
+  const t = (s: string) => tr(s, currentLang);
   // Active promo mode: 'flash_coffee' or 'speed_waterpolo'
   const [activePromo, setActivePromo] = useState<"flash_coffee" | "speed_waterpolo">("flash_coffee");
 
@@ -193,7 +196,7 @@ Dobrodošli u JP Aquana!
 
                 <div className="absolute -top-2 -right-2 bg-gradient-to-r from-rose-600 to-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-300 flex items-center gap-1 animate-pulse shadow-md">
                   <Flame className="w-3 h-3 fill-amber-300 text-amber-300" />
-                  <span>FLASH AKCIJA</span>
+                  <span>{t("FLASH AKCIJA")}</span>
                 </div>
               </div>
             ) : (
@@ -225,7 +228,7 @@ Dobrodošli u JP Aquana!
                     : "bg-sky-500/20 text-sky-400 border-sky-500/30"
                 }`}>
                   <Sparkles className="w-3 h-3 text-amber-300" />
-                  <span>{activePromo === "flash_coffee" ? "DANAŠNJI ZEC IZ ŠEŠIRA" : "BRZA NAGRADNA AKCIJA"}</span>
+                  <span>{activePromo === "flash_coffee" ? t("DANAŠNJI ZEC IZ ŠEŠIRA") : t("BRZA NAGRADNA AKCIJA")}</span>
                 </span>
                 <span className="text-[11px] text-slate-400 font-medium">
                   • Caffe Bar GOB & Recepcija
@@ -235,7 +238,7 @@ Dobrodošli u JP Aquana!
               {activePromo === "flash_coffee" ? (
                 <>
                   <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
-                    {portalSettings?.flashPromo?.title || "Uz sezonsku kartu od 50 ulazaka dobijate 5 besplatnih kafa u Caffe Baru GOB!"}
+                    {t(portalSettings?.flashPromo?.title || "Uz sezonsku kartu od 50 ulazaka dobijate 5 besplatnih kafa u Caffe Baru GOB!")}
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                     {portalSettings?.flashPromo?.description || "Aktivirajte akciju odmah na sajtu i preuzmite digitalni bar-kod kupon koji važi na biletarnici i u našem caffe baru."}
@@ -306,7 +309,7 @@ Dobrodošli u JP Aquana!
                 className="px-4 py-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 hover:text-white border border-cyan-400/40 font-black text-xs uppercase tracking-wider transition flex items-center gap-2 hover:scale-105 cursor-pointer"
               >
                 <Gamepad2 className="w-4 h-4 text-cyan-300" />
-                <span>IGRAJ „UHVATI RIBICU“</span>
+                <span>{t("IGRAJ „UHVATI RIBICU“")}</span>
               </button>
             </div>
           </div>

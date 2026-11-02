@@ -205,12 +205,24 @@ export function saveLang(lang: Lang) {
 
 export function toCyrillic(text: string): string {
   if (!text) return "";
+  let res = text;
+  
+  // Custom brand & common terms
+  res = res.replace(/\bAquana\b/g, "Аквана")
+           .replace(/\bAQUANA\b/g, "АКВАНА")
+           .replace(/\baquana\b/g, "аквана")
+           .replace(/\bCaffe\b/g, "Кафе")
+           .replace(/\bcaffe\b/g, "кафе")
+           .replace(/\bFitness\b/g, "Фитнес")
+           .replace(/\bfitness\b/g, "фитнес")
+           .replace(/\bParking\b/g, "Паркинг")
+           .replace(/\bparking\b/g, "паркинг");
+
   const digraphs: [string, string][] = [
     ["Dž", "Џ"], ["DŽ", "Џ"], ["dž", "џ"],
     ["Lj", "Љ"], ["LJ", "Љ"], ["lj", "љ"],
     ["Nj", "Њ"], ["NJ", "Њ"], ["nj", "њ"],
   ];
-  let res = text;
   for (const [lat, cyr] of digraphs) {
     res = res.replaceAll(lat, cyr);
   }
@@ -223,4 +235,9 @@ export function toCyrillic(text: string): string {
     Ć: "Ћ", U: "У", F: "Ф", H: "Х", C: "Ц", Č: "Ч", Š: "Ш",
   };
   return res.replace(/[a-zA-ZčćžšđČĆŽŠĐ]/g, (ch) => singleMap[ch] || ch);
+}
+
+export function tr(text: string, lang: Lang): string {
+  if (lang === "cir") return toCyrillic(text);
+  return text;
 }

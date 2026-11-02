@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React from "react";
-import { Lang } from "@/lib/translations";
+import { Lang, tr } from "@/lib/translations";
 import { Facebook, Instagram, Heart, MessageCircle, Share2, Sparkles, ExternalLink } from "lucide-react";
 
 interface SocialStreamProps {
@@ -9,6 +9,7 @@ interface SocialStreamProps {
 }
 
 export default function SocialStream({ currentLang }: SocialStreamProps) {
+  const t = (s: string) => tr(s, currentLang);
   const posts = [
     {
       id: 1,
@@ -56,13 +57,13 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-black uppercase tracking-widest mb-2">
               <Sparkles className="w-3.5 h-3.5 text-rose-400 animate-spin" />
-              <span>DRUŠTVENE MREŽE UŽIVO</span>
+              <span>{t("DRUŠTVENE MREŽE UŽIVO")}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-              Pratite puls bazena na mrežama
+              {t("Pratite puls bazena na mrežama")}
             </h2>
             <p className="text-slate-400 text-sm mt-1">
-              Direktne objave, atmosferu sa takmičenja i najnovije fotografije pratite na našim zvaničnim profilima.
+              {t("Direktne objave, atmosferu sa takmičenja i najnovije fotografije pratite na našim zvaničnim profilima.")}
             </p>
           </div>
 
@@ -74,7 +75,7 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition hover:scale-105"
             >
               <Facebook className="w-4 h-4" />
-              <span>Facebook stranica</span>
+              <span>{t("Facebook stranica")}</span>
             </a>
             <a
               href="https://instagram.com"
@@ -83,7 +84,7 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-rose-600 to-amber-600 hover:opacity-90 text-white font-bold text-xs shadow-lg transition hover:scale-105"
             >
               <Instagram className="w-4 h-4" />
-              <span>Instagram profil</span>
+              <span>{t("Instagram profil")}</span>
             </a>
           </div>
         </div>
@@ -106,7 +107,7 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
                       <h4 className="font-bold text-sm text-white group-hover:text-sky-400 transition leading-snug">
                         {post.author}
                       </h4>
-                      <p className="text-[11px] text-slate-400">{post.time}</p>
+                      <p className="text-[11px] text-slate-400">{t(post.time)}</p>
                     </div>
                   </div>
 
@@ -119,7 +120,7 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
 
                 {/* Text */}
                 <p className="text-xs text-slate-200 leading-relaxed">
-                  {post.text}
+                  {t(post.text)}
                 </p>
 
                 {/* Photo */}
@@ -151,7 +152,7 @@ export default function SocialStream({ currentLang }: SocialStreamProps) {
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-400 hover:text-sky-300"
                 >
-                  <span>Pogledaj na mreži</span>
+                  <span>{t("Pogledaj na mreži")}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>

@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React, { useState, useEffect } from "react";
-import { Lang, translations, getSavedLang, saveLang, toCyrillic } from "@/lib/translations";
+import { Lang, translations, getSavedLang, saveLang, toCyrillic, tr } from "@/lib/translations";
 import { getPortalSettings, PortalSettings } from "@/lib/submissionsData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -58,6 +58,7 @@ export default function HomePage() {
   const [fishGameOpen, setFishGameOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const t = translations[currentLang];
+  const txt = (s: string) => tr(s, currentLang);
 
   // Dynamic TOP NEWS / JUST IN spotlight
   const [topNews, setTopNews] = useState<TopNewsData>({
@@ -99,13 +100,13 @@ export default function HomePage() {
               </div>
               <div>
                 <span className="text-xs font-black uppercase tracking-widest text-amber-300 block">
-                  PRIJEM I UPIS NOVIH POLAZNIKA TOKOM ČITAVE GODINE
+                  {txt("PRIJEM I UPIS NOVIH POLAZNIKA TOKOM ČITAVE GODINE")}
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-black tracking-tight">
-                  Obuka neplivača na Gradskom olimpijskom bazenu
+                  {txt("Obuka neplivača na Gradskom olimpijskom bazenu")}
                 </h3>
                 <p className="text-xs sm:text-sm text-sky-100 mt-0.5">
-                  Komercijalni kursevi za djecu i odrasle • Besplatna obuka za banjalučke osnovce (pokrovitelj Grad Banja Luka)
+                  {txt("Komercijalni kursevi za djecu i odrasle • Besplatna obuka za banjalučke osnovce (pokrovitelj Grad Banja Luka)")}
                 </p>
               </div>
             </div>
@@ -116,13 +117,13 @@ export default function HomePage() {
                 className="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm tracking-wide shadow-lg transition hover:scale-105 flex items-center gap-2"
               >
                 <Phone className="w-4 h-4 text-slate-950" />
-                <span>Prijave: 065 72 50 50</span>
+                <span>{txt("Prijave: 065 72 50 50")}</span>
               </a>
               <Link
                 href="/dokumenti"
                 className="px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/25 transition"
               >
-                Cjenovnik obuke
+                {txt("Cjenovnik obuke")}
               </Link>
             </div>
           </div>
@@ -161,7 +162,7 @@ export default function HomePage() {
 
         
         {/* FLASH PROMO AKCIJA: ZEC IZ ŠEŠIRA (50 ulaza + 5 kafa & mini igra) */}
-        <FlashPromoAction onOpenGame={() => setFishGameOpen(true)} />
+        <FlashPromoAction onOpenGame={() => setFishGameOpen(true)} currentLang={currentLang} />
 
         {/* 5. POOL TELEMETRY & LIVE STATUS (Real 100% telemetry, no fake data) */}
         <section id="live-status" className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-8">
@@ -179,13 +180,13 @@ export default function HomePage() {
                 </div>
                 <div>
                   <span className="text-[11px] font-black text-emerald-600 uppercase tracking-wider block">
-                    Društvena odgovornost i jednakost
+                    {txt("Društvena odgovornost i jednakost")}
                   </span>
                   <h4 className="text-lg font-black text-slate-900 mt-1">
-                    Mobilni lift za lica sa posebnim potrebama
+                    {txt("Mobilni lift za lica sa posebnim potrebama")}
                   </h4>
                   <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                    Gradski olimpijski bazen opremljen je specijalizovanom rampom i hidrauličnim liftom koji osobe sa invaliditetom direktno iz invalidskih kolica spušta u vodu i vraća nazad. Pristup objektu je u potpunosti prilagođen.
+                    {txt("Gradski olimpijski bazen opremljen je specijalizovanom rampom i hidrauličnim liftom koji osobe sa invaliditetom direktno iz invalidskih kolica spušta u vodu i vraća nazad. Pristup objektu je u potpunosti prilagođen.")}
                   </p>
                 </div>
               </div>
@@ -197,20 +198,20 @@ export default function HomePage() {
                 </div>
                 <div>
                   <span className="text-[11px] font-black text-cyan-600 uppercase tracking-wider block">
-                    Zdravstveni standard i sigurnost
+                    {txt("Zdravstveni standard i sigurnost")}
                   </span>
                   <h4 className="text-lg font-black text-slate-900 mt-1">
-                    Stroga kontrola vode Instituta
+                    {txt("Stroga kontrola vode Instituta")}
                   </h4>
                   <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                    Institut za javno zdravstvo Republike Srpske redovno vrši mikrobiološku i fizičko-hemijsku analizu vode i kontrolu filter stanice. Svi nalazi su javni i transparentno dostupni na uvid građanima.
+                    {txt("Institut za javno zdravstvo Republike Srpske redovno vrši mikrobiološku i fizičko-hemijsku analizu vode i kontrolu filter stanice. Svi nalazi su javni i transparentno dostupni na uvid građanima.")}
                   </p>
                 </div>
                 <Link
                   href="/dokumenti"
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-700 hover:text-cyan-900 pt-2"
                 >
-                  <span>Otvori registar sanitarnih nalaza</span>
+                  <span>{txt("Otvori registar sanitarnih nalaza")}</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -222,23 +223,23 @@ export default function HomePage() {
                 </div>
                 <div>
                   <span className="text-[11px] font-black text-amber-600 uppercase tracking-wider block">
-                    Sadržaji u sklopu GOB-a
+                    {txt("Sadržaji u sklopu GOB-a")}
                   </span>
                   <h4 className="text-lg font-black text-slate-900 mt-1">
-                    Teretana, Caffe bar i Parking
+                    {txt("Teretana, Caffe bar i Parking")}
                   </h4>
                   <div className="space-y-2 mt-2 text-xs text-slate-600">
                     <p className="flex items-center gap-2">
                       <Dumbbell className="w-4 h-4 text-slate-500 shrink-0" />
-                      <span><strong>Moderna teretana:</strong> Vrhunski fitness centar u sklopu objekta (zakupac).</span>
+                      <span><strong>{txt("Moderna teretana:")}</strong> {txt("Vrhunski fitness centar u sklopu objekta (zakupac).")}</span>
                     </p>
                     <p className="flex items-center gap-2">
                       <Car className="w-4 h-4 text-slate-500 shrink-0" />
-                      <span><strong>Besplatan parking:</strong> Obezbijeđen za sve korisnike bazena.</span>
+                      <span><strong>{txt("Besplatan parking:")}</strong> {txt("Obezbijeđen za sve korisnike bazena.")}</span>
                     </p>
                     <p className="flex items-center gap-2">
                       <Coffee className="w-4 h-4 text-slate-500 shrink-0" />
-                      <span><strong>Caffe bar:</strong> Ugodan ambijent u holu bazena za roditelje i posjetioce.</span>
+                      <span><strong>{txt("Caffe bar:")}</strong> {txt("Ugodan ambijent u holu bazena za roditelje i posjetioce.")}</span>
                     </p>
                   </div>
                 </div>
@@ -270,9 +271,9 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-8">
                   <div className="text-white space-y-1">
                     <span className="px-3 py-1 rounded-full bg-sky-500 text-slate-950 text-xs font-black uppercase tracking-wider">
-                      Olimpijski bazen
+                      {txt("Olimpijski bazen")}
                     </span>
-                    <h3 className="text-2xl font-black">50 × 25 metara • FINA Standard</h3>
+                    <h3 className="text-2xl font-black">{txt("50 × 25 metara • FINA Standard")}</h3>
                   </div>
                 </div>
               </div>
@@ -280,7 +281,7 @@ export default function HomePage() {
               <div className="lg:col-span-5 space-y-5">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wider">
                   <Award className="w-3.5 h-3.5 text-blue-600" />
-                  Banja Luka • Veljka Mlađenovića b.b.
+                  {txt("Banja Luka • Veljka Mlađenovića b.b.")}
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                   {currentLang === "cir"
@@ -290,29 +291,29 @@ export default function HomePage() {
                     : "Gradski olimpijski bazen (GOB)"}
                 </h2>
                 <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                  Jedan od najmodernijih vodenih kompleksa u Evropi. Izgrađen po standardima Svjetske plivačke federacije (FINA), otvoren svakog dana za građane, plivačke i vaterpolo klubove, te takmičenja najvišeg međunarodnog nivoa.
+                  {txt("Jedan od najmodernijih vodenih kompleksa u Evropi. Izgrađen po standardima Svjetske plivačke federacije (FINA), otvoren svakog dana za građane, plivačke i vaterpolo klubove, te takmičenja najvišeg međunarodnog nivoa.")}
                 </p>
 
                 <div className="space-y-3 pt-2">
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-sm text-slate-900 block">Rekreacija za građanstvo</strong>
-                      <span className="text-xs text-slate-500">Svaki dan od 06:00 do 22:00h (vikendom od 07:00h).</span>
+                      <strong className="text-sm text-slate-900 block">{txt("Rekreacija za građanstvo")}</strong>
+                      <span className="text-xs text-slate-500">{txt("Svaki dan od 06:00 do 22:00h (vikendom od 07:00h).")}</span>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-sm text-slate-900 block">Škola plivanja za djecu i odrasle</strong>
-                      <span className="text-xs text-slate-500">Stručni rad sa profesorima sporta i licenciranim trenerima.</span>
+                      <strong className="text-sm text-slate-900 block">{txt("Škola plivanja za djecu i odrasle")}</strong>
+                      <span className="text-xs text-slate-500">{txt("Stručni rad sa profesorima sporta i licenciranim trenerima.")}</span>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-sm text-slate-900 block">Dostupnost i inkluzija</strong>
-                      <span className="text-xs text-slate-500">Mobilni hidraulični lift za spuštanje osoba sa invaliditetom u vodu.</span>
+                      <strong className="text-sm text-slate-900 block">{txt("Dostupnost i inkluzija")}</strong>
+                      <span className="text-xs text-slate-500">{txt("Mobilni hidraulični lift za spuštanje osoba sa invaliditetom u vodu.")}</span>
                     </div>
                   </div>
                 </div>
@@ -323,7 +324,7 @@ export default function HomePage() {
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wide transition shadow-md"
                   >
                     <FileText className="w-4 h-4 text-sky-400" />
-                    <span>Provjeri cjenovnik i termine</span>
+                    <span>{txt("Provjeri cjenovnik i termine")}</span>
                   </a>
                 </div>
               </div>
@@ -334,7 +335,7 @@ export default function HomePage() {
               <div className="lg:col-span-5 space-y-5 order-2 lg:order-1">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider">
                   <Sun className="w-3.5 h-3.5 text-amber-600" />
-                  Naselje Borik • Aleja Svetog Save 80
+                  {txt("Naselje Borik • Aleja Svetog Save 80")}
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                   {currentLang === "cir"
@@ -344,21 +345,21 @@ export default function HomePage() {
                     : "Vodeni park Aquana"}
                 </h2>
                 <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                  Najveća ljetna vodena atrakcija Banjaluke. Prostire se na 38.000 m² uređenih zelenih površina sa prirodnim hladom, tri velika otvorena bazena ukupne vodene površine 1.500 m², toboganom dužine 100 metara, sunčalištem i ljetnim manifestacijama na otvorenom.
+                  {txt("Najveća ljetna vodena atrakcija Banjaluke. Prostire se na 38.000 m² uređenih zelenih površina sa prirodnim hladom, tri velika otvorena bazena ukupne vodene površine 1.500 m², toboganom dužine 100 metara, sunčalištem i ljetnim manifestacijama na otvorenom.")}
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 pt-2 text-center">
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                     <p className="text-xl font-black text-sky-600">38.000m²</p>
-                    <p className="text-[11px] text-slate-500 font-medium">Zeleni park</p>
+                    <p className="text-[11px] text-slate-500 font-medium">{txt("Zeleni park")}</p>
                   </div>
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                     <p className="text-xl font-black text-amber-500">100m</p>
-                    <p className="text-[11px] text-slate-500 font-medium">Vodeni tobogan</p>
+                    <p className="text-[11px] text-slate-500 font-medium">{txt("Vodeni tobogan")}</p>
                   </div>
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                     <p className="text-xl font-black text-emerald-500">3 bazena</p>
-                    <p className="text-[11px] text-slate-500 font-medium">Vodeni sadržaji</p>
+                    <p className="text-[11px] text-slate-500 font-medium">{txt("Vodeni sadržaji")}</p>
                   </div>
                 </div>
 
@@ -367,7 +368,7 @@ export default function HomePage() {
                     href="/dokumenti"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wide transition shadow-md"
                   >
-                    <span>Cjenovnik sezonskih ulaznica</span>
+                    <span>{txt("Cjenovnik sezonskih ulaznica")}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
