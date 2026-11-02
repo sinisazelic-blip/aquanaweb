@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { Lang, translations } from "@/lib/translations";
@@ -9,11 +9,12 @@ interface HeaderProps {
   currentLang: Lang;
   setLang: (l: Lang) => void;
   onOpenSurvey: () => void;
+  onOpenContact?: () => void;
   searchQuery?: string;
   setSearchQuery?: (q: string) => void;
 }
 
-export default function Header({ currentLang, setLang, onOpenSurvey, searchQuery, setSearchQuery }: HeaderProps) {
+export default function Header({ currentLang, setLang, onOpenSurvey, onOpenContact, searchQuery, setSearchQuery }: HeaderProps) {
   const t = translations[currentLang];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -240,3 +241,4 @@ export default function Header({ currentLang, setLang, onOpenSurvey, searchQuery
     </header>
   );
 }
+

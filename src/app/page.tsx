@@ -14,6 +14,8 @@ import SurveyModal from "@/components/SurveyModal";
 import FlashPromoAction from "@/components/FlashPromoAction";
 import FishGameModal from "@/components/FishGameModal";
 import KidsContestBanner from "@/components/KidsContestBanner";
+import ContactModal from "@/components/ContactModal";
+import VisitorCommentsSection from "@/components/VisitorCommentsSection";
 
 import Link from "next/link";
 import {
@@ -42,6 +44,7 @@ export default function HomePage() {
   const [surveyOpen, setSurveyOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [fishGameOpen, setFishGameOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const t = translations[currentLang];
 
   // Dynamic TOP NEWS / JUST IN spotlight
@@ -66,7 +69,7 @@ export default function HomePage() {
       <Header
         currentLang={currentLang}
         setLang={setCurrentLang}
-        onOpenSurvey={() => setSurveyOpen(true)}
+        onOpenSurvey={() => setSurveyOpen(true)} onOpenContact={() => setContactOpen(true)}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
@@ -438,6 +441,9 @@ export default function HomePage() {
         </section>
       </main>
 
+      {/* 12.5 GLAS POSJETILACA - ZID UTISAKA */}
+      <VisitorCommentsSection />
+
       {/* 13. SOBER MODERN FOOTER */}
       <Footer currentLang={currentLang} />
 
@@ -449,6 +455,8 @@ export default function HomePage() {
         onClose={() => setFishGameOpen(false)}
       />
 
+      <ContactModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
+
       <SurveyModal
         isOpen={surveyOpen}
         onClose={() => setSurveyOpen(false)}
@@ -457,4 +465,5 @@ export default function HomePage() {
     </>
   );
 }
+
 

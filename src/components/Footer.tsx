@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Lang, translations } from "@/lib/translations";
-import { Waves, MapPin, Phone, Mail, Clock, ExternalLink, ShieldCheck, FileText, Droplet } from "lucide-react";
+import { Waves, MapPin, Phone, Mail, Clock, ExternalLink, ShieldCheck, FileText, Droplet, Settings } from "lucide-react";
 import Link from "next/link";
 
 interface FooterProps {
@@ -140,12 +140,20 @@ export default function Footer({ currentLang }: FooterProps) {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               Sistem aktivan
             </span>
+            <Link
+              href="/admin"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition"
+              title="Admin CMS Portal"
+            >
+              <Settings className="w-3.5 h-3.5" />
+            </Link>
           </p>
         </div>
       </div>
     </footer>
   );
 }
+
 
 
 

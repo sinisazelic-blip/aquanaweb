@@ -37,7 +37,12 @@ import {
   Edit,
   KeyRound,
   ExternalLink,
-  Info
+  Info,
+  Mail,
+  Check,
+  X,
+  Send,
+  CheckSquare
 } from "lucide-react";
 import Link from "next/link";
 import { allNewsArticles, NewsItem } from "@/lib/newsData";
@@ -57,7 +62,13 @@ import {
   BANNER_SLOTS,
   BannerPosition,
   getCommercialBanners,
-  saveCommercialBanners
+  saveCommercialBanners,
+  VisitorComment,
+  getVisitorComments,
+  saveAllVisitorComments,
+  ContactInquiry,
+  getContactInquiries,
+  saveAllContactInquiries
 } from "@/lib/submissionsData";
 
 export default function AdminPortalPage() {
@@ -77,12 +88,16 @@ export default function AdminPortalPage() {
   const [newRole, setNewRole] = useState<UserRole>("webadmin");
 
   // Navigation Tab State
-  const [activeTab, setActiveTab] = useState<"surveys" | "coupons" | "drawings" | "news" | "tenders" | "banners" | "users">("surveys");
+  type AdminTab = "surveys" | "coupons" | "drawings" | "news" | "tenders" | "banners" | "users" | "comments" | "inquiries" | "reception";
+  const [activeTab, setActiveTab] = useState<AdminTab>("surveys");
 
   // Submissions State
   const [surveys, setSurveys] = useState<SurveySubmission[]>([]);
   const [coupons, setCoupons] = useState<CouponClaim[]>([]);
   const [drawings, setDrawings] = useState<KidsDrawingSubmission[]>([]);
+  const [commentsList, setCommentsList] = useState<VisitorComment[]>([]);
+  const [inquiriesList, setInquiriesList] = useState<ContactInquiry[]>([]);
+  const [receptionSearch, setReceptionSearch] = useState("");
 
   // News State
   const [newsList, setNewsList] = useState<NewsItem[]>(allNewsArticles);
@@ -121,6 +136,9 @@ export default function AdminPortalPage() {
         if (match && match.status === "Aktivan") {
           setIsAuthenticated(true);
           setCurrentUser(match);
+          if (match.role === "recepcija") {
+            setActiveTab("reception");
+          }
         }
       }
     } catch {
@@ -132,6 +150,8 @@ export default function AdminPortalPage() {
     setDrawings(getKidsDrawings());
     setTendersList(getStoredTenders());
     setBannersList(getCommercialBanners());
+    setCommentsList(getVisitorComments());
+    setInquiriesList(getContactInquiries());
   }, []);
 
   // Handle Login (Checks against dynamic users list + always sinisa:turtle1964)
@@ -175,6 +195,9 @@ export default function AdminPortalPage() {
   const loginSuccess = (user: AdminUser) => {
     setIsAuthenticated(true);
     setCurrentUser(user);
+    if (user.role === "recepcija") {
+      setActiveTab("reception");
+    }
     try {
       localStorage.setItem("aquana_admin_session", JSON.stringify(user));
     } catch {
@@ -192,6 +215,37 @@ export default function AdminPortalPage() {
     }
   };
 
+  // --- COMMENTS MANAGEMENT (ZID UTISAKA) ---
+  const toggleCommentStatus = (id: string) => {
+    const updated = commentsList.map((c) =>
+      c.id === id ? { ...c, status: (c.status === "approved" ? "hidden" : "approved") as "approved" | "hidden" } : c
+    );
+    setCommentsList(updated);
+    saveAllVisitorComments(updated);
+  };
+
+  const deleteComment = (id: string) => {
+    if (confirm("Da li ste sigurni da želite trajno obrisati ovaj komentar sa sajta?")) {
+      const updated = commentsList.filter((c) => c.id !== id);
+      setCommentsList(updated);
+      saveAllVisitorComments(updated);
+    }
+  };
+
+  // --- INQUIRIES MANAGEMENT (UPITI UPRAVI) ---
+  const toggleInquiryStatus = (id: string) => {
+    const statuses: ContactInquiry["status"][] = ["Novo", "Odgovoreno", "Arhivirano"];
+    const updated = inquiriesList.map((inq) => {
+      if (inq.id === id) {
+        const nextIdx = (statuses.indexOf(inq.status) + 1) % statuses.length;
+        return { ...inq, status: statuses[nextIdx] };
+      }
+      return inq;
+    });
+    setInquiriesList(updated);
+    saveAllContactInquiries(updated);
+  };
+
   // --- USER MANAGEMENT FUNCTIONS (Superadmin only) ---
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +255,8 @@ export default function AdminPortalPage() {
       superadmin: "Glavni Administrator / Superadmin",
       webadmin: "Urednik web portala i vijesti",
       referent_nabavke: "Referent za javne nabavke i ugovore",
-      referent_pr: "PR & Marketing referent"
+      referent_pr: "PR & Marketing referent",
+      recepcija: "Biletarnica i recepcija bazena"
     };
 
     const newUser: AdminUser = {
@@ -459,7 +514,17 @@ export default function AdminPortalPage() {
             <span className="text-xs font-black bg-sky-600 px-2 py-0.5 rounded text-white tracking-widest uppercase">CMS</span>
           </Link>
           <span className="hidden sm:inline text-slate-600">|</span>
-          <span className="text-xs font-bold text-slate-300">JP „Aquana“ d.o.o. Banja Luka</span>
+          <span className="text-xs font-bold text-slate-300 hidden md:inline">JP „Aquana“ d.o.o. Banja Luka</span>
+
+          {/* RETURN TO PUBLIC PORTAL BUTTON */}
+          <Link
+            href="/"
+            className="ml-2 px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-sky-600 text-sky-300 hover:text-white border border-slate-700 hover:border-sky-500 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+            title="Povratak na javni portal Aquana"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>← Povratak na portal (aquana.ba)</span>
+          </Link>
         </div>
 
         {/* User profile & Role */}
@@ -491,6 +556,19 @@ export default function AdminPortalPage() {
       {/* Main Tabs Navigation */}
       <div className="bg-white border-b border-slate-200 px-6 overflow-x-auto shadow-sm">
         <div className="flex items-center gap-2 min-w-max py-2">
+          {/* RECEPTION TAB (Very important for front-desk tickets & coupons) */}
+          <button
+            onClick={() => setActiveTab("reception")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "reception"
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
+                : "text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200"
+            }`}
+          >
+            <Ticket className="w-4 h-4 text-emerald-500" />
+            <span>Recepcija / Biletarnica ({coupons.filter(c => c.status === "Aktivan").length} aktivnih)</span>
+          </button>
+
           <button
             onClick={() => setActiveTab("surveys")}
             className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
@@ -504,6 +582,30 @@ export default function AdminPortalPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab("comments")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "comments"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            }`}
+          >
+            <MessageSquare className="w-4 h-4 text-pink-400" />
+            <span>Zid utisaka ({commentsList.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("inquiries")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
+              activeTab === "inquiries"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            }`}
+          >
+            <Mail className="w-4 h-4 text-amber-400" />
+            <span>Upiti upravi ({inquiriesList.length})</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("coupons")}
             className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition ${
               activeTab === "coupons"
@@ -511,7 +613,7 @@ export default function AdminPortalPage() {
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
-            <Ticket className="w-4 h-4 text-amber-400" />
+            <Sparkles className="w-4 h-4 text-amber-400" />
             <span>Flash Kuponi ({coupons.length})</span>
           </button>
 
@@ -582,6 +684,301 @@ export default function AdminPortalPage() {
 
       {/* Main Dashboard Content Area */}
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+        {/* TAB 0: RECEPTION & TICKETING DESK (RECEPTION ROLE & SUPERADMIN) */}
+        {activeTab === "reception" && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-emerald-900 to-teal-950 p-6 rounded-3xl text-white shadow-xl border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-emerald-300 text-xs font-black uppercase tracking-wider mb-1">
+                  <Ticket className="w-4 h-4 text-emerald-400" />
+                  <span>Recepcija & Biletarnica Gradskog olimpijskog bazena</span>
+                </div>
+                <h2 className="text-2xl font-black text-white">Validacija i izdavanje vaučera / karata</h2>
+                <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                  Unesite broj telefona posjetioca ili kod kupona/karte (npr. <span className="text-emerald-300 font-mono font-bold">#VP-MEČ</span> ili <span className="text-amber-300 font-mono font-bold">#AQUANA-</span>) i jednim klikom označite status iskorištenja.
+                </p>
+              </div>
+
+              {/* Status summary */}
+              <div className="flex items-center gap-3">
+                <div className="bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-emerald-500/30 text-center">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Aktivnih kupona</span>
+                  <span className="text-2xl font-black text-emerald-400 font-mono">
+                    {coupons.filter((c) => c.status === "Aktivan").length}
+                  </span>
+                </div>
+                <div className="bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-slate-700 text-center">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Iskorištenih</span>
+                  <span className="text-2xl font-black text-slate-400 font-mono">
+                    {coupons.filter((c) => c.status === "Iskorišten").length}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Search Bar for Receptionist */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+              <Search className="w-5 h-5 text-slate-400 shrink-0 ml-2" />
+              <input
+                type="text"
+                value={receptionSearch}
+                onChange={(e) => setReceptionSearch(e.target.value)}
+                placeholder="Brza pretraga: unesite broj telefona ili šifru vaučera (npr. 065 123 456 ili VP-MEČ)..."
+                className="w-full text-sm font-semibold bg-transparent focus:outline-none placeholder:text-slate-400"
+              />
+              {receptionSearch && (
+                <button
+                  onClick={() => setReceptionSearch("")}
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Reception Table */}
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                    <th className="py-3 px-4">Kod kupona / karte</th>
+                    <th className="py-3 px-4">Pogodnost / Svrha</th>
+                    <th className="py-3 px-4">Telefon posjetioca</th>
+                    <th className="py-3 px-4">Datum rezervacije</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Potvrda recepcije</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {coupons
+                    .filter((c) => {
+                      if (!receptionSearch.trim()) return true;
+                      const q = receptionSearch.toLowerCase();
+                      return c.code.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q) || c.facility.toLowerCase().includes(q);
+                    })
+                    .map((c) => {
+                      const isSpeedTicket = c.code.startsWith("#VP-MEČ");
+                      return (
+                        <tr key={c.id} className="hover:bg-slate-50 transition">
+                          <td className="py-3.5 px-4">
+                            <span className={`font-mono font-black text-sm px-2.5 py-1 rounded-lg border ${
+                              isSpeedTicket
+                                ? "bg-amber-50 text-amber-900 border-amber-300"
+                                : "bg-sky-50 text-sky-900 border-sky-300"
+                            }`}>
+                              {c.code}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 font-bold text-slate-800">
+                            {isSpeedTicket ? "Ulaznica: Vaterpolo prvenstvena utakmica (Tribine)" : c.facility}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono font-bold text-slate-700">
+                            {c.phone}
+                          </td>
+                          <td className="py-3.5 px-4 text-slate-500 font-mono">
+                            {c.date}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                              c.status === "Aktivan"
+                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse"
+                                : "bg-slate-200 text-slate-600"
+                            }`}>
+                              ● {c.status === "Aktivan" ? "Čeka preuzimanje" : "Iskorišten"}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            {c.status === "Aktivan" ? (
+                              <button
+                                onClick={() => toggleCouponStatus(c.id)}
+                                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-emerald-600/30 transition hover:scale-105 inline-flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>Izdaj vaučer / Potvrdi</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => toggleCouponStatus(c.id)}
+                                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] transition cursor-pointer"
+                                title="Poništi status ako je greškom označeno"
+                              >
+                                Poništi iskorištenje
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: VISITOR COMMENTS (ZID UTISAKA) */}
+        {activeTab === "comments" && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Zid utisaka – Komentari posjetilaca</h3>
+                <p className="text-xs text-slate-500">
+                  Pregled i moderacija komentara. Odobreni komentari se javno prikazuju na naslovnoj strani portala (posljednjih 5).
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-xl bg-pink-50 text-pink-700 border border-pink-200 text-xs font-bold">
+                Ukupno komentara u bazi: {commentsList.length}
+              </span>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                    <th className="py-3 px-4">Autor</th>
+                    <th className="py-3 px-4">Kategorija</th>
+                    <th className="py-3 px-4">Komentar / Utisak</th>
+                    <th className="py-3 px-4">Datum</th>
+                    <th className="py-3 px-4">Status prikaza</th>
+                    <th className="py-3 px-4 text-right">Moderacija</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {commentsList.map((c) => (
+                    <tr key={c.id} className="hover:bg-slate-50 transition">
+                      <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
+                        {c.author}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
+                          c.category === "Pohvala"
+                            ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                            : c.category === "Prijedlog"
+                            ? "bg-sky-100 text-sky-800 border border-sky-300"
+                            : "bg-amber-100 text-amber-800 border border-amber-300"
+                        }`}>
+                          {c.category}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-700 max-w-md">
+                        {c.text}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-500 font-mono whitespace-nowrap">
+                        {c.date}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                          c.status === "approved"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-slate-200 text-slate-700"
+                        }`}>
+                          ● {c.status === "approved" ? "Javno vidljiv" : "Sakriven"}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => toggleCommentStatus(c.id)}
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold transition cursor-pointer"
+                          >
+                            {c.status === "approved" ? "Sakrij sa sajta" : "Odobri za prikaz"}
+                          </button>
+                          <button
+                            onClick={() => deleteComment(c.id)}
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition cursor-pointer"
+                            title="Obriši komentar"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: CITIZEN INQUIRIES (UPITI UPRAVI) */}
+        {activeTab === "inquiries" && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Upiti posjetilaca i građana (info@aquana.ba)</h3>
+                <p className="text-xs text-slate-500">
+                  Direktne poruke upućene upravi preduzeća putem kontakt obrasca na portalu.
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">
+                Ukupno upita: {inquiriesList.length}
+              </span>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 font-black text-slate-700 uppercase">
+                    <th className="py-3 px-4">Ime i Prezime</th>
+                    <th className="py-3 px-4">Kontakt (Email / Tel)</th>
+                    <th className="py-3 px-4">Služba</th>
+                    <th className="py-3 px-4">Sadržaj poruke</th>
+                    <th className="py-3 px-4">Datum i vrijeme</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Akcije</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {inquiriesList.map((inq) => (
+                    <tr key={inq.id} className="hover:bg-slate-50 transition">
+                      <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
+                        {inq.fullName}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono font-bold text-sky-700 whitespace-nowrap">
+                        {inq.contact}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[10px]">
+                          {inq.department}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-800 max-w-sm">
+                        {inq.message}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-500 font-mono whitespace-nowrap">
+                        {inq.date}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <button
+                          onClick={() => toggleInquiryStatus(inq.id)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase cursor-pointer ${
+                            inq.status === "Novo"
+                              ? "bg-rose-100 text-rose-800 border border-rose-300 animate-pulse"
+                              : inq.status === "Odgovoreno"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                              : "bg-slate-200 text-slate-700"
+                          }`}
+                          title="Kliknite za promjenu statusa"
+                        >
+                          ● {inq.status}
+                        </button>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <a
+                          href={`mailto:${inq.contact}?subject=Odgovor JP Aquana Banja Luka - Upit ${inq.id}`}
+                          className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-[11px] inline-flex items-center gap-1 border border-sky-200"
+                        >
+                          <Send className="w-3 h-3" />
+                          <span>Odgovori</span>
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* TAB 1: SURVEY ANALYTICS */}
         {activeTab === "surveys" && (
           <div className="space-y-6">
@@ -900,6 +1297,16 @@ export default function AdminPortalPage() {
                       </td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          <a
+                            href={`/dokumenti/${encodeURIComponent(t.file)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-[11px] font-bold inline-flex items-center gap-1 border border-sky-200 transition"
+                            title="Otvori i pregledaj PDF u novom prozoru"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Pregledaj PDF</span>
+                          </a>
                           <button
                             onClick={() => toggleTenderStatus(t.id)}
                             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700"

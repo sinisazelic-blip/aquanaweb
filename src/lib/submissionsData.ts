@@ -180,7 +180,7 @@ export const saveKidsDrawing = (drawing: { childName: string; age: number; title
 };
 
 // --- ADMIN USERS & ROLES ---
-export type UserRole = "superadmin" | "webadmin" | "referent_nabavke" | "referent_pr";
+export type UserRole = "superadmin" | "webadmin" | "referent_nabavke" | "referent_pr" | "recepcija";
 
 export interface AdminUser {
   id: string;
@@ -233,6 +233,16 @@ export const initialAdminUsers: AdminUser[] = [
     role: "referent_pr",
     status: "Aktivan",
     createdAt: "01.11.2026."
+  },
+  {
+    id: "usr-5",
+    username: "recepcija",
+    password: "gob2026!",
+    name: "Recepcija GOB",
+    title: "Biletarnica i recepcija bazena",
+    role: "recepcija",
+    status: "Aktivan",
+    createdAt: "02.11.2026."
   }
 ];
 
@@ -340,4 +350,204 @@ export const saveCommercialBanners = (banners: CommercialBanner[]) => {
   if (typeof window !== "undefined") {
     localStorage.setItem("aquana_commercial_banners", JSON.stringify(banners));
   }
+};
+
+// --- VISITOR COMMENTS / WALL OF IMPRESSIONS (ZID UTISAKA) ---
+export interface VisitorComment {
+  id: string;
+  author: string;
+  text: string;
+  date: string;
+  category: "Pohvala" | "Kritika" | "Prijedlog";
+  status: "approved" | "hidden";
+}
+
+export const initialComments: VisitorComment[] = [
+  {
+    id: "com-1",
+    author: "Goran M. (rekreativac)",
+    text: "Bazen i voda su besprijekorno čisti, ali je parking oko bazena uvijek krcat oko 17 časova. Bilo bi dobro označiti dodatna mjesta.",
+    date: "01.11.2026.",
+    category: "Prijedlog",
+    status: "approved"
+  },
+  {
+    id: "com-2",
+    author: "Maja K.",
+    text: "Sve pohvale za trenere škole plivanja! Jedina molba: možete li popraviti treći fen u ženskoj svlačionici?",
+    date: "31.10.2026.",
+    category: "Prijedlog",
+    status: "approved"
+  },
+  {
+    id: "com-3",
+    author: "Nenad S.",
+    text: "Jutarnji termin od 06:00 do 08:00h je najbolja stvar koju ste uveli. Mirno, čisto, staze slobodne.",
+    date: "30.10.2026.",
+    category: "Pohvala",
+    status: "approved"
+  },
+  {
+    id: "com-4",
+    author: "Jelena D.",
+    text: "Kafa u caffe baru GOB je odlična, a pogled na bazen prelijep dok čekam dijete sa treninga.",
+    date: "29.10.2026.",
+    category: "Pohvala",
+    status: "approved"
+  },
+  {
+    id: "com-5",
+    author: "Dejan P.",
+    text: "Može li se postaviti aparat za vodu ili sokove na tribinama tokom vikend mitinga?",
+    date: "28.10.2026.",
+    category: "Prijedlog",
+    status: "approved"
+  }
+];
+
+export const getVisitorComments = (): VisitorComment[] => {
+  if (typeof window === "undefined") return initialComments;
+  try {
+    const raw = localStorage.getItem("aquana_visitor_comments");
+    if (!raw) return initialComments;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialComments;
+  } catch {
+    return initialComments;
+  }
+};
+
+export const saveVisitorComment = (comment: { author: string; text: string; category: VisitorComment["category"] }): VisitorComment => {
+  const newEntry: VisitorComment = {
+    id: `com-${Date.now().toString().slice(-4)}`,
+    author: comment.author.trim() || "Posjetilac",
+    text: comment.text.trim(),
+    date: new Date().toLocaleDateString("sr-BA"),
+    category: comment.category,
+    status: "approved"
+  };
+  if (typeof window !== "undefined") {
+    const current = getVisitorComments();
+    const updated = [newEntry, ...current];
+    localStorage.setItem("aquana_visitor_comments", JSON.stringify(updated));
+  }
+  return newEntry;
+};
+
+export const saveAllVisitorComments = (comments: VisitorComment[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aquana_visitor_comments", JSON.stringify(comments));
+  }
+};
+
+// --- CONTACT FORM INQUIRIES (UPRAVA) ---
+export interface ContactInquiry {
+  id: string;
+  fullName: string;
+  contact: string;
+  department: string;
+  message: string;
+  date: string;
+  status: "Novo" | "Odgovoreno" | "Arhivirano";
+}
+
+export const initialInquiries: ContactInquiry[] = [
+  {
+    id: "INQ-201",
+    fullName: "Milan Vasić",
+    contact: "milan.v@gmail.com",
+    department: "Zakup staze i saradnja",
+    message: "Poštovani, zanima nas mogućnost zakupa 2 staze za rekreaciju radnika preduzeća u večernjim terminima. Molimo za ponudu.",
+    date: "01.11.2026. 11:30",
+    status: "Novo"
+  }
+];
+
+export const getContactInquiries = (): ContactInquiry[] => {
+  if (typeof window === "undefined") return initialInquiries;
+  try {
+    const raw = localStorage.getItem("aquana_contact_inquiries");
+    if (!raw) return initialInquiries;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialInquiries;
+  } catch {
+    return initialInquiries;
+  }
+};
+
+export const saveContactInquiry = (inquiry: { fullName: string; contact: string; department: string; message: string }): ContactInquiry => {
+  const newEntry: ContactInquiry = {
+    id: `INQ-${Date.now().toString().slice(-4)}`,
+    ...inquiry,
+    date: new Date().toLocaleString("sr-BA", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+    status: "Novo"
+  };
+  if (typeof window !== "undefined") {
+    const current = getContactInquiries();
+    const updated = [newEntry, ...current];
+    localStorage.setItem("aquana_contact_inquiries", JSON.stringify(updated));
+  }
+  return newEntry;
+};
+
+export const saveAllContactInquiries = (inquiries: ContactInquiry[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aquana_contact_inquiries", JSON.stringify(inquiries));
+  }
+};
+
+// --- SPEED CONTEST (BRZOPRSTICE - LIMITIRANE NAGRADE) ---
+export interface SpeedContestState {
+  title: string;
+  description: string;
+  totalQuota: number;
+  remainingQuota: number;
+  matchInfo: string;
+  isActive: boolean;
+}
+
+export const initialSpeedContest: SpeedContestState = {
+  title: "BRZOPRSTICA: Prvih 5 posjetilaca dobijaju BESPLATNU KARTU!",
+  description: "Za predstojeću prvenstvenu vaterpolo utakmicu na Gradskom olimpijskom bazenu u subotu u 18:00h.",
+  totalQuota: 5,
+  remainingQuota: 3,
+  matchInfo: "VK Banja Luka vs VK Borac • Subota 18:00h • Veliki olimpijski bazen",
+  isActive: true
+};
+
+export const getSpeedContestState = (): SpeedContestState => {
+  if (typeof window === "undefined") return initialSpeedContest;
+  try {
+    const raw = localStorage.getItem("aquana_speed_contest");
+    if (!raw) return initialSpeedContest;
+    return JSON.parse(raw);
+  } catch {
+    return initialSpeedContest;
+  }
+};
+
+export const claimSpeedTicket = (phone: string): { success: boolean; code?: string; remaining?: number } => {
+  const state = getSpeedContestState();
+  if (state.remainingQuota <= 0) {
+    return { success: false, remaining: 0 };
+  }
+  const newRemaining = state.remainingQuota - 1;
+  const updatedState = { ...state, remainingQuota: newRemaining };
+  const ticketCode = `#VP-MEČ-${5 - newRemaining}`;
+  
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aquana_speed_contest", JSON.stringify(updatedState));
+    // Also save as claimed coupon for reception
+    const coupons = JSON.parse(localStorage.getItem("aquana_coupons") || "[]");
+    coupons.unshift({
+      id: `TKT-${Date.now().toString().slice(-4)}`,
+      code: ticketCode,
+      phone: phone.trim(),
+      date: new Date().toLocaleString("sr-BA"),
+      facility: "Utakmica GOB (Tribine)",
+      status: "Aktivan"
+    });
+    localStorage.setItem("aquana_coupons", JSON.stringify(coupons));
+  }
+  return { success: true, code: ticketCode, remaining: newRemaining };
 };

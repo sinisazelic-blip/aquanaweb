@@ -14,7 +14,7 @@ export const initialTenders: TenderItem[] = [
     "date": "03.07.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-Набавка-хемијских-средстава-за-санитарни-третман-воде.pdf"
+    "file": "Odluka-o-izboru-Nabavka-hemijskih-sredstava-za-sanitarni-tretman-vode.pdf"
   },
   {
     "id": 2,
@@ -22,7 +22,7 @@ export const initialTenders: TenderItem[] = [
     "date": "03.07.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-Набавка-хемијских-средстава-за-санитарни-третман-воде.pdf"
+    "file": "Odluka-o-izboru-Nabavka-hemijskih-sredstava-za-sanitarni-tretman-vode.pdf"
   },
   {
     "id": 3,
@@ -30,7 +30,7 @@ export const initialTenders: TenderItem[] = [
     "date": "03.07.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-Набавка-хемијских-средстава-за-санитарни-третман-воде-1.pdf"
+    "file": "Odluka-o-izboru-Nabavka-hemijskih-sredstava-za-sanitarni-tretman-vode-1.pdf"
   },
   {
     "id": 4,
@@ -38,7 +38,7 @@ export const initialTenders: TenderItem[] = [
     "date": "22.06.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca.pdf"
   },
   {
     "id": 5,
@@ -46,7 +46,7 @@ export const initialTenders: TenderItem[] = [
     "date": "22.06.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача-набавка-лож-уља-за-загријавање-Градског-олимпијског-базена.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca-nabavka-loz-ulja-za-zagrijavanje-Gradskog-olimpijskog-bazena.pdf"
   },
   {
     "id": 6,
@@ -54,7 +54,7 @@ export const initialTenders: TenderItem[] = [
     "date": "22.06.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca.pdf"
   },
   {
     "id": 7,
@@ -62,7 +62,7 @@ export const initialTenders: TenderItem[] = [
     "date": "27.05.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-пословни-простор-21032025.pdf"
+    "file": "Odluka-poslovni-prostor-21032025.pdf"
   },
   {
     "id": 8,
@@ -70,7 +70,7 @@ export const initialTenders: TenderItem[] = [
     "date": "27.05.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-пословни-простор-21032025-Copy.pdf"
+    "file": "Odluka-poslovni-prostor-21032025-Copy.pdf"
   },
   {
     "id": 9,
@@ -142,7 +142,7 @@ export const initialTenders: TenderItem[] = [
     "date": "30.04.2026.",
     "year": "2026",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-.pdf"
+    "file": "Odluka-o-izboru-.pdf"
   },
   {
     "id": 18,
@@ -158,7 +158,7 @@ export const initialTenders: TenderItem[] = [
     "date": "31.12.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Преговарачки-поступак-без-објаве-обавјештења-електрична-енергија.pdf"
+    "file": "Pregovaracki-postupak-bez-objave-obavjestenja-elektricna-energija.pdf"
   },
   {
     "id": 20,
@@ -174,7 +174,7 @@ export const initialTenders: TenderItem[] = [
     "date": "30.12.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-поништењу-поступка-ЈН-Реконструкција-и-санација-цјелина-2-Дјечије-игралиште.pdf"
+    "file": "Odluka-o-ponistenju-postupka-JN-Rekonstrukcija-i-sanacija-cjelina-2-Djecije-igraliste.pdf"
   },
   {
     "id": 22,
@@ -438,7 +438,7 @@ export const initialTenders: TenderItem[] = [
     "date": "05.05.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача-набавка-пића-за-угоститељство.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca-nabavka-pica-za-ugostiteljstvo.pdf"
   },
   {
     "id": 55,
@@ -446,7 +446,7 @@ export const initialTenders: TenderItem[] = [
     "date": "05.05.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca.pdf"
   },
   {
     "id": 56,
@@ -470,7 +470,7 @@ export const initialTenders: TenderItem[] = [
     "date": "05.05.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача-набавка-лож-уља-за-загријавање-Градског-олимпијског-базена.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca-nabavka-loz-ulja-za-zagrijavanje-Gradskog-olimpijskog-bazena.pdf"
   },
   {
     "id": 59,
@@ -518,7 +518,7 @@ export const initialTenders: TenderItem[] = [
     "date": "21.03.2025.",
     "year": "2025",
     "status": "Aktivno",
-    "file": "Одлука-о-избору-Набавка-хемијских-средстава-за-санитарни-третман-воде.pdf"
+    "file": "Odluka-o-izboru-Nabavka-hemijskih-sredstava-za-sanitarni-tretman-vode.pdf"
   },
   {
     "id": 65,
@@ -558,7 +558,7 @@ export const initialTenders: TenderItem[] = [
     "date": "14.02.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача-у-конкурентском-захтјеву-за-набавку-Материјала-за-техничко-одржавање.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca-u-konkurentskom-zahtjevu-za-nabavku-Materijala-za-tehnicko-odrzavanje.pdf"
   },
   {
     "id": 70,
@@ -606,7 +606,7 @@ export const initialTenders: TenderItem[] = [
     "date": "14.02.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-најповољнијег-понуђача.pdf"
+    "file": "Odluka-o-izboru-najpovoljnijeg-ponudjaca.pdf"
   },
   {
     "id": 76,
@@ -686,7 +686,7 @@ export const initialTenders: TenderItem[] = [
     "date": "14.02.2025.",
     "year": "2025",
     "status": "Dodijeljen ugovor",
-    "file": "Одлука-о-избору-фаза-3.2.pdf"
+    "file": "Odluka-o-izboru-faza-3.2.pdf"
   },
   {
     "id": 86,
