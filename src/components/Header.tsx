@@ -35,14 +35,14 @@ export default function Header({ currentLang, setLang, onOpenSurvey, onOpenConta
             </span>
             <span className="inline-flex items-center gap-1.5 text-sky-100">
               <Phone className="w-3.5 h-3.5 text-amber-300" />
-              <span>Uprava: +387 (0) 51 456 230</span>
+              <span>{currentLang === "cir" ? "Управа:" : currentLang === "en" ? "Administration:" : "Uprava:"} +387 (0) 51 456 230</span>
             </span>
             <span className="hidden md:inline-flex items-center gap-1.5 text-sky-100">
               <Phone className="w-3.5 h-3.5 text-cyan-300" />
-              <span>Recepcija GOB: +387 (0) 51 456 450</span>
+              <span>{currentLang === "cir" ? "Рецепција ГОБ:" : currentLang === "en" ? "Reception:" : "Recepcija GOB:"} +387 (0) 51 456 450</span>
             </span>
             <span className="hidden lg:inline text-sky-100/90 text-xs">
-              • Obuka neplivača: 065 72 50 50 • info@aquana.ba
+              • {currentLang === "cir" ? "Обука непливача:" : currentLang === "en" ? "Swim school:" : "Obuka neplivača:"} 065 72 50 50 • info@aquana.ba
             </span>
           </div>
 

@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Lang, tr } from "@/lib/translations";
 import { realClubs } from "@/lib/realPoolData";
+import { getPortalSettings, PortalSettings } from "@/lib/submissionsData";
+import { useEffect } from "react";
 import { Droplets, Thermometer, Clock, Activity, ShieldCheck, Users, Award, Radio } from "lucide-react";
 
 interface PoolLiveStatusProps {
@@ -11,6 +13,12 @@ interface PoolLiveStatusProps {
 
 export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
   const [activeRadar, setActiveRadar] = useState<"gob" | "vp">("gob");
+  const [portalSettings, setPortalSettings] = useState<PortalSettings | null>(null);
+  useEffect(() => { setPortalSettings(getPortalSettings()); }, []);
+  const waterTemp = portalSettings?.telemetry?.waterTemp || "26.8";
+  const airTemp = portalSettings?.telemetry?.airTemp || "28.5";
+  const waterStatus = portalSettings?.telemetry?.waterStatus || "FINA takmičarska norma";
+  const airStatus = portalSettings?.telemetry?.airStatus || "Klimatizovana dvorana";
   const t = (s: string) => tr(s, currentLang);
 
   return (
@@ -78,10 +86,10 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
               <iframe
                 src="https://ulazi.aquana.ba/widget/occupancy"
                 title={t("Trenutna popunjenost - JP Aquana")}
-                width="340"
-                height="340"
+                width="360"
+                height="360"
                 scrolling="no"
-                className="rounded-2xl max-w-full bg-transparent border-0"
+                className="rounded-3xl max-w-none bg-transparent border-0 drop-shadow-md transform scale-[0.82] sm:scale-[0.86] origin-center -my-5"
               />
             </div>
           ) : (
@@ -112,8 +120,8 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
               </div>
               <div>
                 <p className="text-[11px] text-slate-500 font-bold uppercase">{t("Temperatura vode")}</p>
-                <p className="text-2xl font-black text-slate-900">26.8 °C</p>
-                <span className="text-[10px] text-emerald-600 font-bold">{t("FINA takmičarska norma")}</span>
+                <p className="text-2xl font-black text-slate-900">{waterTemp} °C</p>
+                <span className="text-[10px] text-emerald-600 font-bold">{t(waterStatus)}</span>
               </div>
             </div>
 
@@ -124,8 +132,8 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
               </div>
               <div>
                 <p className="text-[11px] text-slate-500 font-bold uppercase">{t("Temperatura dvorane")}</p>
-                <p className="text-2xl font-black text-slate-900">28.5 °C</p>
-                <span className="text-[10px] text-sky-600 font-bold">{t("Klimatizovana dvorana")}</span>
+                <p className="text-2xl font-black text-slate-900">{airTemp} °C</p>
+                <span className="text-[10px] text-sky-600 font-bold">{t(airStatus)}</span>
               </div>
             </div>
 

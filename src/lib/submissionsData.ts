@@ -554,7 +554,17 @@ export const claimSpeedTicket = (phone: string): { success: boolean; code?: stri
 
 
 // --- PORTAL CMS SETTINGS (ZIMSKI/LJETNI REŽIM, TOP OBAVJEŠTENJE, FLASH AKCIJA) ---
+export interface PoolTelemetrySettings {
+  waterTemp: string;
+  airTemp: string;
+  waterStatus: string;
+  airStatus: string;
+  lastUpdated: string;
+  updatedBy: string;
+}
+
 export interface PortalSettings {
+  telemetry?: PoolTelemetrySettings;
   topBanner: {
     isActive: boolean;
     tag: string;
@@ -574,6 +584,14 @@ export interface PortalSettings {
 }
 
 export const initialPortalSettings: PortalSettings = {
+  telemetry: {
+    waterTemp: "26.8",
+    airTemp: "28.5",
+    waterStatus: "FINA takmičarska norma",
+    airStatus: "Klimatizovana dvorana",
+    lastUpdated: "Danas u 07:00h",
+    updatedBy: "Recepcija GOB"
+  },
   topBanner: {
     isActive: true,
     tag: "TOP NEWS / VANREDNO",
