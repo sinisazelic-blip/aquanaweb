@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Lang } from "@/lib/translations";
+import { Lang, tr } from "@/lib/translations";
 import { ChevronLeft, ChevronRight, Waves, Sun, Award, ArrowRight, HeartHandshake, Droplet, Phone } from "lucide-react";
 import Link from "next/link";
 
@@ -127,7 +127,7 @@ export default function HeroSlider({ currentLang }: HeroSliderProps) {
           {/* Glowing Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/25 border border-sky-400/40 text-sky-200 text-xs font-black tracking-wider uppercase backdrop-blur-md shadow-lg">
             <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
-            <span>{slide.badge}</span>
+            <span>{tr(slide.badge, currentLang)}</span>
           </div>
 
           {/* Heading */}
@@ -154,7 +154,7 @@ export default function HeroSlider({ currentLang }: HeroSliderProps) {
               href={slide.ctaPrimaryLink}
               className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-sky-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
             >
-              <span>{slide.ctaPrimaryText}</span>
+              <span>{tr(slide.ctaPrimaryText, currentLang)}</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
@@ -162,7 +162,7 @@ export default function HeroSlider({ currentLang }: HeroSliderProps) {
               href={slide.ctaSecondaryLink}
               className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm tracking-wide border border-white/25 backdrop-blur-md transition hover:border-white/40 flex items-center gap-2"
             >
-              <span>{slide.ctaSecondaryText}</span>
+              <span>{tr(slide.ctaSecondaryText, currentLang)}</span>
             </a>
           </div>
         </div>

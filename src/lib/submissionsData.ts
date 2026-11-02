@@ -179,6 +179,16 @@ export const saveKidsDrawing = (drawing: { childName: string; age: number; title
   return newEntry;
 };
 
+export const voteKidsDrawing = (id: string): KidsDrawingSubmission[] => {
+  if (typeof window === "undefined") return initialKidsDrawings;
+  const current = getKidsDrawings();
+  const updated = current.map((d) => (d.id === id ? { ...d, votes: d.votes + 1 } : d));
+  try {
+    localStorage.setItem("aquana_drawings", JSON.stringify(updated));
+  } catch {}
+  return updated;
+};
+
 // --- ADMIN USERS & ROLES ---
 export type UserRole = "superadmin" | "webadmin" | "referent_nabavke" | "referent_pr" | "recepcija";
 

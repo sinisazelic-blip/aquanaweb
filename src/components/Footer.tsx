@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import React from "react";
-import { Lang, translations } from "@/lib/translations";
+import { Lang, translations, tr } from "@/lib/translations";
+import { useLanguage } from "@/context/LanguageContext";
 import { Waves, MapPin, Phone, Mail, Clock, ExternalLink, ShieldCheck, FileText, Droplet, Settings } from "lucide-react";
 import Link from "next/link";
 
@@ -9,7 +10,10 @@ interface FooterProps {
   currentLang: Lang;
 }
 
-export default function Footer({ currentLang }: FooterProps) {
+export default function Footer({ currentLang: propLang }: { currentLang?: Lang }) {
+  const langCtx = useLanguage();
+  const currentLang = propLang || langCtx.currentLang;
+  const txt = (s: string) => tr(s, currentLang);
   const t = translations[currentLang].footer;
 
   return (
@@ -33,12 +37,12 @@ export default function Footer({ currentLang }: FooterProps) {
             </p>
             <div className="text-[11px] text-slate-400 space-y-1.5 pt-2 border-t border-slate-800/80">
               <div>
-                <p className="font-bold text-slate-300">JP „AQUANA“ d.o.o. Banja Luka</p>
+                <p className="font-bold text-slate-300">{txt("JP „AQUANA“ d.o.o. Banja Luka")}</p>
                 <p className="text-slate-500 font-mono">JIB: 4402636750000 • PIB: 402636750000</p>
               </div>
               <div>
-                <p className="font-bold text-slate-300">Gradski olimpijski bazen (GOB)</p>
-                <p className="text-slate-500">Objekat u javnom vlasništvu Grada Banja Luka (Upravlja JP „Aquana“)</p>
+                <p className="font-bold text-slate-300">{txt("Gradski olimpijski bazen (GOB)")}</p>
+                <p className="text-slate-500">{txt("Objekat u javnom vlasništvu Grada Banja Luka (Upravlja JP „Aquana“)")}</p>
               </div>
             </div>
           </div>
@@ -52,16 +56,16 @@ export default function Footer({ currentLang }: FooterProps) {
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
                 <div>
-                  <strong className="text-slate-200 block">Gradski olimpijski bazen (GOB)</strong>
-                  <span>Veljka Mlađenovića b.b, Banja Luka</span>
-                  <span className="block text-slate-500 text-[11px] mt-0.5">Obezbijeđen besplatan parking za korisnike</span>
+                  <strong className="text-slate-200 block">{txt("Gradski olimpijski bazen (GOB)")}</strong>
+                  <span>{txt("Veljka Mlađenovića b.b, Banja Luka")}</span>
+                  <span className="block text-slate-500 text-[11px] mt-0.5">{txt("Obezbijeđen besplatan parking za korisnike")}</span>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
                 <div>
-                  <strong className="text-slate-200 block">Vodeni park Aquana</strong>
-                  <span>Aleja Svetog Save 80, Banja Luka</span>
+                  <strong className="text-slate-200 block">{txt("Vodeni park Aquana")}</strong>
+                  <span>{txt("Aleja Svetog Save 80, Banja Luka")}</span>
                 </div>
               </div>
             </div>
@@ -75,15 +79,15 @@ export default function Footer({ currentLang }: FooterProps) {
             <div className="space-y-2 text-xs text-slate-400">
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-sky-400" />
-                <span>Uprava / Centrala: +387 (0) 51 456 230</span>
+                <span>{txt("Uprava / Centrala:")} +387 (0) 51 456 230</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-cyan-400" />
-                <span>Recepcija GOB: +387 (0) 51 456 450</span>
+                <span>{txt("Recepcija GOB:")} +387 (0) 51 456 450</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-400" />
-                <span>Obuka neplivača: +387 (0) 65 72 50 50</span>
+                <span>{txt("Obuka neplivača:")} +387 (0) 65 72 50 50</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-sky-400" />
@@ -91,7 +95,7 @@ export default function Footer({ currentLang }: FooterProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-sky-400" />
-                <span>06:00 – 22:00h (Svaki dan)</span>
+                <span>{txt("06:00 – 22:00h (Svaki dan)")}</span>
               </div>
             </div>
           </div>
@@ -126,9 +130,11 @@ export default function Footer({ currentLang }: FooterProps) {
           <div className="flex items-center gap-1.5 text-slate-500">
             <span className="text-[10px] text-slate-500 font-normal">Powered by</span>
             <a
-              href="mailto:info@fluxa.ba?subject=Aquana%20Web%20Portal%20-%20Upit"
+              href="https://fluxa.ba/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center transition opacity-45 hover:opacity-90"
-              title="Fluxa IT"
+              title="Fluxa IT - https://fluxa.ba/"
             >
               <img src="/firma/logo-light.png" alt="Fluxa" className="h-3 w-auto object-contain" />
             </a>

@@ -164,7 +164,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                       <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-black text-white text-base">{slot.label}</h4>
+                      <h4 className="font-black text-white text-base">{t(slot.label)}</h4>
                       <span className="text-[11px] text-slate-400">
                         {freeLanesCount > 0
                           ? t(`Dostupno ${freeLanesCount} slobodnih staza za građane i rekreativce`)
@@ -218,9 +218,9 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
                         ) : (
                           <div className="space-y-0.5">
                             <span className="text-[10px] font-black text-emerald-400 block uppercase tracking-wider">
-                              GRAĐANSTVO
+                              {t('GRAĐANSTVO')}
                             </span>
-                            <span className="text-[9px] text-emerald-300/80 block">Rekreacija</span>
+                            <span className="text-[9px] text-emerald-300/80 block">{t("Rekreacija")}</span>
                           </div>
                         )}
 
@@ -273,7 +273,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
               href="/cjenovnik"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-400 hover:text-sky-300 transition"
             >
-              <span>{t("Pregledaj cijene ulaznica")}</span>
+              <span>{tr("Pregledaj cijene ulaznica", currentLang)}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

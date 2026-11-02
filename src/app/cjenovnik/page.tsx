@@ -18,16 +18,19 @@ import {
   Eye
 } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
+import { tr } from "@/lib/translations";
 
 export default function CjenovnikPage() {
-  const [currentLang, setCurrentLang] = useState<any>("lat");
+  const { currentLang, setLang } = useLanguage();
+  const txt = (s: string) => tr(s, currentLang);
   const [activeTab, setActiveTab] = useState<"gob" | "aquana">("gob");
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       <Header
         currentLang={currentLang}
-        setLang={setCurrentLang}
+        setLang={setLang}
         onOpenSurvey={() => {}}
       />
 
@@ -40,10 +43,10 @@ export default function CjenovnikPage() {
               <span>ZVANIČNE TARIFE I CJENOVNICI</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-              Cjenovnik usluga i ulaznica
+              {txt("Cjenovnik usluga i ulaznica")}
             </h1>
             <p className="text-slate-400 text-sm max-w-xl">
-              Transparentan prikaz svih tarifa za Gradski olimpijski bazen i Vodeni park Aquana. Sve cijene su izražene u KM sa uračunatim PDV-om.
+              {txt("Transparentan prikaz svih tarifa za Gradski olimpijski bazen i Vodeni park Aquana. Sve cijene su izražene u KM sa uračunatim PDV-om.")}
             </p>
           </div>
 
@@ -52,7 +55,7 @@ export default function CjenovnikPage() {
             className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-2 transition"
           >
             <Download className="w-4 h-4 text-cyan-400" />
-            <span>Preuzmi ovjeren PDF cjenovnik</span>
+            <span>{txt("Preuzmi ovjeren PDF cjenovnik")}</span>
           </Link>
         </div>
       </section>
@@ -92,7 +95,7 @@ export default function CjenovnikPage() {
             <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-slate-700 flex items-start gap-3">
               <Info className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" />
               <div>
-                <strong className="text-slate-900 block font-bold">Informacije o radnom vremenu:</strong>
+                <strong className="text-slate-900 block font-bold">{txt("Informacije o radnom vremenu:")}</strong>
                 <span>Gradski olimpijski bazen radi svakog radnog dana od 06:00 do 22:00h, a vikendom od 07:00 do 22:00h. Kupovina karata se vrši na recepciji GOB-a ili putem elektronske evidencije.</span>
               </div>
             </div>
@@ -104,10 +107,10 @@ export default function CjenovnikPage() {
               <div className="space-y-2 text-center lg:text-left z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-xs font-bold border border-sky-400/30 uppercase tracking-wider">
                   <ShieldCheck className="w-4 h-4 text-cyan-300" />
-                  <span>ODLUKA GRADONAČELNIKA GRADA BANJA LUKA</span>
+                  <span>{txt("ODLUKA GRADONAČELNIKA GRADA BANJA LUKA")}</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                  Zvanični cjenovnik usluga GOB-a propisan od strane Grada Banja Luka
+                  {txt("Zvanični cjenovnik usluga GOB-a propisan od strane Grada Banja Luka")}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
                   Kao vlasnik sportskog objekta Gradskog olimpijskog bazena, Grad Banja Luka i Gradonačelnik zvanično propisuju tarifu za rekreativce, plivačke i vaterpolo klubove, te povlaštene kategorije građana.
@@ -249,10 +252,10 @@ export default function CjenovnikPage() {
               <div className="space-y-2 text-center lg:text-left z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-xs font-bold border border-sky-400/30 uppercase tracking-wider">
                   <ShieldCheck className="w-4 h-4 text-cyan-300" />
-                  <span>ODLUKA GRADONAČELNIKA GRADA BANJA LUKA</span>
+                  <span>{txt("ODLUKA GRADONAČELNIKA GRADA BANJA LUKA")}</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                  Zvanični cjenovnik usluga GOB-a propisan od strane Grada Banja Luka
+                  {txt("Zvanični cjenovnik usluga GOB-a propisan od strane Grada Banja Luka")}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
                   Kao vlasnik sportskog objekta Gradskog olimpijskog bazena, Grad Banja Luka i Gradonačelnik zvanično propisuju tarifu za rekreativce, plivačke i vaterpolo klubove, te povlaštene kategorije građana.

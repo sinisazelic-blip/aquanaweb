@@ -1,37 +1,9 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { Lang, translations } from "@/lib/translations";
+import { Lang, translations, toCyrillic } from "@/lib/translations";
 
-export const toCyrillic = (text: string): string => {
-  if (!text) return "";
-  const map: Record<string, string> = {
-    "DŽ": "Џ", "Dž": "Џ", "dž": "џ",
-    "LJ": "Љ", "Lj": "Љ", "lj": "љ",
-    "NJ": "Њ", "Nj": "Њ", "nj": "њ",
-    "A": "А", "B": "Б", "V": "В", "G": "Г", "D": "Д", "Đ": "Ђ", "E": "Е",
-    "Ž": "Ж", "Z": "З", "I": "И", "J": "Ј", "K": "К", "L": "Л", "M": "М",
-    "N": "Н", "O": "О", "P": "П", "R": "Р", "S": "С", "T": "Т", "Ć": "Ћ",
-    "U": "У", "F": "Ф", "H": "Х", "C": "Ц", "Č": "Ч", "Š": "Ш",
-    "a": "а", "b": "б", "v": "в", "g": "г", "d": "д", "đ": "ђ", "e": "е",
-    "ž": "ж", "z": "з", "i": "и", "j": "ј", "k": "к", "l": "л", "m": "м",
-    "n": "н", "o": "о", "p": "п", "r": "р", "s": "с", "t": "т", "ć": "ћ",
-    "u": "у", "f": "ф", "h": "х", "c": "ц", "č": "ч", "š": "ш"
-  };
-
-  let res = text;
-  // Replace digraphs first
-  for (const dig of ["DŽ", "Dž", "dž", "LJ", "Lj", "lj", "NJ", "Nj", "nj"]) {
-    res = res.split(dig).join(map[dig]);
-  }
-  // Replace single characters
-  let out = "";
-  for (let i = 0; i < res.length; i++) {
-    const ch = res[i];
-    out += map[ch] !== undefined ? map[ch] : ch;
-  }
-  return out;
-};
+export { toCyrillic };
 
 interface LanguageContextType {
   currentLang: Lang;

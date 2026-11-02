@@ -178,7 +178,7 @@ Dobrodošli u JP Aquana!
           {/* Left Column: Graphics + Action Offer */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left z-10">
             {activePromo === "flash_coffee" ? (
-              /* Graphic Badge 1: 50 ULAZA + 5 KAFA */
+              /* Graphic Badge 1: {t('50 ULAZA + 5 KAFA')} */
               <div className="relative shrink-0">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-amber-400 to-rose-500 p-0.5 shadow-2xl flex items-center justify-center">
                   <div className="w-full h-full bg-slate-950 rounded-[22px] flex flex-col items-center justify-center p-2 text-center">
@@ -231,7 +231,7 @@ Dobrodošli u JP Aquana!
                   <span>{activePromo === "flash_coffee" ? t("DANAŠNJI ZEC IZ ŠEŠIRA") : t("BRZA NAGRADNA AKCIJA")}</span>
                 </span>
                 <span className="text-[11px] text-slate-400 font-medium">
-                  • Caffe Bar GOB & Recepcija
+                  • {t('Caffe Bar GOB & Recepcija')}
                 </span>
               </div>
 
@@ -299,7 +299,7 @@ Dobrodošli u JP Aquana!
                   {claimedCoupon
                     ? `VAUČER SAČUVAN (${claimedCoupon.code})`
                     : activePromo === "flash_coffee"
-                    ? "REZERVIŠI KUPON ODMAH"
+                    ? t("REZERVIŠI KUPON ODMAH")
                     : "PREUZMI KARTU (BRZOPRSTICA)"}
                 </span>
               </button>

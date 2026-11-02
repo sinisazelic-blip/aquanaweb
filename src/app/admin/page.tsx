@@ -115,6 +115,9 @@ export default function AdminPortalPage() {
   const [newTenderYear, setNewTenderYear] = useState("2026");
   const [newTenderStatus, setNewTenderStatus] = useState<TenderItem["status"]>("Aktivno");
   const [newTenderFile, setNewTenderFile] = useState("");
+  const [newTenderFileSize, setNewTenderFileSize] = useState("");
+  const [newBannerImageName, setNewBannerImageName] = useState("");
+  const [newBannerImagePreview, setNewBannerImagePreview] = useState("");
 
   // Commercial Banners State
   const [bannersList, setBannersList] = useState<CommercialBanner[]>([]);
@@ -2210,6 +2213,52 @@ export default function AdminPortalPage() {
                 </select>
               </div>
 
+              {/* UPLOAD BANER SLIKE */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Upload slike banera (JPG, PNG, GIF, WebP):
+                </label>
+                <div className="p-3.5 rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition text-center relative group">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setNewBannerImageName(file.name);
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          setNewBannerImagePreview(ev.target?.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                  />
+                  {newBannerImagePreview ? (
+                    <div className="space-y-2">
+                      <img
+                        src={newBannerImagePreview}
+                        alt="Preview"
+                        className="max-h-24 mx-auto rounded-lg shadow-sm border border-slate-200 object-contain"
+                      />
+                      <p className="text-[11px] font-mono text-indigo-700 font-bold">
+                        ✓ {newBannerImageName} (kliknite za zamjenu)
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="py-2 space-y-1">
+                      <p className="text-xs font-bold text-indigo-900">
+                        Kliknite ili prevucite sliku banera ovdje
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        Preporučene dimenzije: {BANNER_SLOTS[newBannerPosition].dimensions}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Web link klijenta (URL):</label>
                 <input
@@ -2218,7 +2267,7 @@ export default function AdminPortalPage() {
                   value={newBannerLink}
                   onChange={(e) => setNewBannerLink(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white font-mono"
                 />
               </div>
 
@@ -2320,15 +2369,53 @@ export default function AdminPortalPage() {
                 </div>
               </div>
 
+              {/* UPLOAD PDF DOKUMENTA */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Naziv PDF dokumenta:</label>
-                <input
-                  type="text"
-                  value={newTenderFile}
-                  onChange={(e) => setNewTenderFile(e.target.value)}
-                  placeholder="npr. Odluka-o-izboru-2026.pdf"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-slate-50 font-mono"
-                />
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Upload zvaničnog PDF dokumenta:
+                </label>
+                <div className="p-4 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/60 hover:bg-emerald-50 transition text-center relative group">
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setNewTenderFile(file.name);
+                        const kb = Math.round(file.size / 1024);
+                        setNewTenderFileSize(`${kb} KB`);
+                      }
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                  />
+                  {newTenderFile ? (
+                    <div className="flex items-center justify-center gap-3 py-1">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-xs">
+                        PDF
+                      </div>
+                      <div className="text-left">
+                        <strong className="text-xs font-mono text-emerald-900 block truncate max-w-xs">
+                          {newTenderFile}
+                        </strong>
+                        <span className="text-[10px] text-emerald-600 font-bold">
+                          ✓ Spreman za objavu {newTenderFileSize ? `(${newTenderFileSize})` : ""}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-2 space-y-1">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-1">
+                        📄
+                      </div>
+                      <p className="text-xs font-bold text-emerald-950">
+                        Kliknite za odabir PDF dokumenta sa računara
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        Odluka, tenderska dokumentacija ili obavještenje (.pdf)
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-2 pt-3">

@@ -24,16 +24,19 @@ import {
   Eye
 } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
+import { tr } from "@/lib/translations";
 import { realClubs } from "@/lib/realPoolData";
 
 export default function GobDetailedPage() {
-  const [currentLang, setCurrentLang] = useState<any>("lat");
+  const { currentLang, setLang } = useLanguage();
+  const txt = (s: string) => tr(s, currentLang);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       <Header
         currentLang={currentLang}
-        setLang={setCurrentLang}
+        setLang={setLang}
         onOpenSurvey={() => {}}
       />
 
@@ -65,7 +68,7 @@ export default function GobDetailedPage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl drop-shadow-md">
-            Gradski olimpijski bazen (GOB)
+            {txt("Gradski olimpijski bazen (GOB)")}
           </h1>
 
           <p className="text-slate-100 text-base sm:text-xl max-w-3xl leading-relaxed drop-shadow">
@@ -77,7 +80,7 @@ export default function GobDetailedPage() {
               href="#cjenovnik"
               className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-blue-950 font-black text-sm tracking-wide transition shadow-xl shadow-cyan-500/25 flex items-center gap-2"
             >
-              <span>Zvanični cjenovnik GOB-a</span>
+              <span>{txt("Zvanični cjenovnik GOB-a")}</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
@@ -86,7 +89,7 @@ export default function GobDetailedPage() {
               className="px-6 py-3.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm border border-white/30 backdrop-blur-md transition flex items-center gap-2 shadow-md"
             >
               <Phone className="w-4 h-4 text-amber-300" />
-              <span>Obuka neplivača: 065 72 50 50</span>
+              <span>{txt("Obuka neplivača: 065 72 50 50")}</span>
             </a>
           </div>
         </div>
@@ -99,14 +102,14 @@ export default function GobDetailedPage() {
           <div className="border-b border-slate-200 pb-4">
             <span className="text-xs font-bold text-sky-600 uppercase tracking-widest block">INFRASTRUKTURA & PARAMETRI</span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Tehničke specifikacije objekta
+              {txt("Tehničke specifikacije objekta")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
               <span className="text-3xl font-black text-sky-600 block">50 × 25 m</span>
-              <h3 className="font-bold text-slate-900 text-sm">Veliki olimpijski bazen</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Veliki olimpijski bazen")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Dubina 2.20 m ravnomjerno, 10 takmičarskih staza sa razdjelnicima talasa i 2.500 m³ FINA vode.
               </p>
@@ -114,7 +117,7 @@ export default function GobDetailedPage() {
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
               <span className="text-3xl font-black text-cyan-600 block">25 × 10 m</span>
-              <h3 className="font-bold text-slate-900 text-sm">Mali bazen za obuku</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Mali bazen za obuku")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Dubina 1.40 m ravnomjerno, prilagođena za školu plivanja, rasplivavanje i rad sa djecom i početnicima.
               </p>
@@ -122,7 +125,7 @@ export default function GobDetailedPage() {
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
               <span className="text-3xl font-black text-blue-600 block">OMEGA</span>
-              <h3 className="font-bold text-slate-900 text-sm">Mjerenje vremena</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Mjerenje vremena")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Najsavremeniji startni blokovi sa touch-panel senzorima i elektronskim semaforom najviše klase.
               </p>
@@ -130,7 +133,7 @@ export default function GobDetailedPage() {
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
               <span className="text-3xl font-black text-emerald-600 block">532</span>
-              <h3 className="font-bold text-slate-900 text-sm">Gledalište & Tribine</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Gledalište & Tribine")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Sjedeća mjesta za publiku na tribinama, klimatizovan prostor i moderna ozvučenja za mitinge.
               </p>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
@@ -20,15 +20,18 @@ import {
   LifeBuoy
 } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
+import { tr } from "@/lib/translations";
 
 export default function VodeniParkDetailedPage() {
-  const [currentLang, setCurrentLang] = useState<any>("lat");
+  const { currentLang, setLang } = useLanguage();
+  const txt = (s: string) => tr(s, currentLang);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       <Header
         currentLang={currentLang}
-        setLang={setCurrentLang}
+        setLang={setLang}
         onOpenSurvey={() => {}}
       />
 
@@ -39,7 +42,7 @@ export default function VodeniParkDetailedPage() {
         <div className="absolute inset-0">
           <img
             src="/images/vodeni-park.jpg"
-            alt="Vodeni park Aquana Borik"
+            alt={`${txt("Vodeni park Aquana")} Borik`}
             className="w-full h-full object-cover object-center brightness-105 saturate-[1.25]"
           />
         </div>
@@ -54,7 +57,7 @@ export default function VodeniParkDetailedPage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl">
-            Vodeni park Aquana
+            {txt("Vodeni park Aquana")}
           </h1>
 
           <p className="text-slate-200 text-base sm:text-xl max-w-3xl leading-relaxed">
@@ -66,7 +69,7 @@ export default function VodeniParkDetailedPage() {
               href="#cjenovnik"
               className="px-7 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm tracking-wide transition shadow-lg shadow-amber-400/20 flex items-center gap-2"
             >
-              <span>Sezonski cjenovnik 2026</span>
+              <span>{txt("Sezonski cjenovnik 2026")}</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
@@ -75,7 +78,7 @@ export default function VodeniParkDetailedPage() {
               className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/25 backdrop-blur-md transition flex items-center gap-2"
             >
               <FileText className="w-4 h-4 text-cyan-300" />
-              <span>Zvanični dokumenti</span>
+              <span>{txt("Zvanični dokumenti")}</span>
             </Link>
           </div>
         </div>
@@ -88,14 +91,14 @@ export default function VodeniParkDetailedPage() {
           <div className="border-b border-slate-200 pb-4">
             <span className="text-xs font-bold text-amber-600 uppercase tracking-widest block">KOMPLEKS & ATRAKCIJE</span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Sadržaji vodenog parka
+              {txt("Sadržaji vodenog parka")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
               <span className="text-3xl font-black text-amber-500 block">100 m</span>
-              <h3 className="font-bold text-slate-900 text-sm">Vodeni tobogan</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Vodeni tobogan")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Veliki tobogan sa vodenim tokom, vrtlogom, masažnim ležištima i mlazevima za sve uzraste.
               </p>
@@ -103,7 +106,7 @@ export default function VodeniParkDetailedPage() {
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
               <span className="text-3xl font-black text-sky-500 block">3 bazena</span>
-              <h3 className="font-bold text-slate-900 text-sm">Ukupno 1.500 m² vode</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Ukupno 1.500 m² vode")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Plivački bazen za plivače, bazen sa atrakcijama i plitki dječiji bazen sa vodenom pečurkom.
               </p>
@@ -111,15 +114,15 @@ export default function VodeniParkDetailedPage() {
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
               <span className="text-3xl font-black text-emerald-600 block">24.000 m²</span>
-              <h3 className="font-bold text-slate-900 text-sm">Zelene površine & Hlad</h3>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Zelene površine & Hlad")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Prostrane zelene kaskade sa prirodnim drvećem i hladom, idealno za cjelodnevni boravak porodica.
               </p>
             </div>
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
-              <span className="text-3xl font-black text-rose-500 block">Spasioci</span>
-              <h3 className="font-bold text-slate-900 text-sm">Licencirana bezbjednost</h3>
+              <span className="text-3xl font-black text-rose-500 block">{txt("Spasioci")}</span>
+              <h3 className="font-bold text-slate-900 text-sm">{txt("Licencirana bezbjednost")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Stalna spasilačka služba sa međunarodnim licencama na svim bazenima tokom čitavog radnog vremena.
               </p>
@@ -135,7 +138,7 @@ export default function VodeniParkDetailedPage() {
               Besprijekorna higijena i automatska filtracija
             </h2>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Vodeni park Aquana koristi najsavremenija automatska postrojenja za kontinuirano prečišćavanje, hlorisanje i cirkulaciju vode. Kvalitet vode se provjerava više puta dnevno na licu mjesta, uz redovnu zvaničnu kontrolu od strane Instituta za javno zdravstvo Republike Srpske.
+              {txt("Vodeni park Aquana")} koristi najsavremenija automatska postrojenja za kontinuirano prečišćavanje, hlorisanje i cirkulaciju vode. Kvalitet vode se provjerava više puta dnevno na licu mjesta, uz redovnu zvaničnu kontrolu od strane Instituta za javno zdravstvo Republike Srpske.
             </p>
 
             <div className="space-y-3">
@@ -169,7 +172,7 @@ export default function VodeniParkDetailedPage() {
             <div>
               <span className="text-xs font-bold text-amber-600 uppercase tracking-widest block">SLUŽBENI CJENOVNIK</span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Cjenovnik ulaznica – Vodeni park Aquana (Sezona 2026)
+                Cjenovnik ulaznica – {txt("Vodeni park Aquana")} (Sezona 2026)
               </h2>
             </div>
             <Link

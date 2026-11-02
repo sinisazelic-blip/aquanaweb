@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Lang } from "@/lib/translations";
+import { Lang, tr } from "@/lib/translations";
 import { X, Star, CheckCircle, Send, MessageSquare } from "lucide-react";
 import { saveSurvey } from "@/lib/submissionsData";
 
@@ -11,6 +11,7 @@ interface SurveyModalProps {
 }
 
 export default function SurveyModal({ isOpen, onClose, currentLang }: SurveyModalProps) {
+  const txt = (s: string) => tr(s, currentLang);
   const [submitted, setSubmitted] = useState(false);
   const [q1, setQ1] = useState("nekoliko_puta_mjesecno");
   const [comment, setComment] = useState("");
@@ -79,17 +80,17 @@ export default function SurveyModal({ isOpen, onClose, currentLang }: SurveyModa
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase">Učestalost Vaših posjeta:</label>
+              <label className="text-xs font-bold text-slate-700 uppercase">{txt("Učestalost Vaših posjeta:")}</label>
               <select value={q1} onChange={(e) => setQ1(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20">
-                <option value="vise_puta_sedmicno">Više puta sedmično (redovan rekreativac/član)</option>
-                <option value="jednom_sedmicno">Jednom sedmično</option>
-                <option value="nekoliko_puta_mjesecno">Nekoliko puta mjesečno</option>
-                <option value="rijetko">Rijetko / Prvi put</option>
+                <option value="vise_puta_sedmicno">{txt("Više puta sedmično (redovan rekreativac/član)")}</option>
+                <option value="jednom_sedmicno">{txt("Jednom sedmično")}</option>
+                <option value="nekoliko_puta_mjesecno">{txt("Nekoliko puta mjesečno")}</option>
+                <option value="rijetko">{txt("Rijetko / Prvi put")}</option>
               </select>
             </div>
 
             <div className="space-y-2.5 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
-              <label className="text-xs font-bold text-slate-700 uppercase block">Ocjene kvaliteta (1 – 5 zvjezdica):</label>
+              <label className="text-xs font-bold text-slate-700 uppercase block">{txt("Ocjene kvaliteta (1 – 5 zvjezdica):")}</label>
               {[
                 { key: "cistoca", label: "Čistoća prostora, tuševa i svlačionica" },
                 { key: "kvalitetVode", label: "Bistrina i hemijsko-biološki kvalitet vode" },
@@ -98,7 +99,7 @@ export default function SurveyModal({ isOpen, onClose, currentLang }: SurveyModa
                 { key: "raspored", label: "Dostupnost termina za građanstvo" },
               ].map(({ key, label }) => (
                 <div key={key} className="flex items-center justify-between py-1 border-b border-slate-200/60 last:border-none">
-                  <span className="text-xs text-slate-700 font-semibold">{label}</span>
+                  <span className="text-xs text-slate-700 font-semibold">{txt(label)}</span>
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button type="button" key={star} onClick={() => handleRating(key as keyof typeof ratings, star)} className="p-1 hover:scale-110 transition">
@@ -113,7 +114,7 @@ export default function SurveyModal({ isOpen, onClose, currentLang }: SurveyModa
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
                 <MessageSquare className="w-3.5 h-3.5 text-sky-600" />
-                <span>Vaša poruka, prijedlog ili sugestija:</span>
+                <span>{txt("Vaša poruka, prijedlog ili sugestija:")}</span>
               </label>
               <textarea
                 value={comment}
@@ -125,7 +126,7 @@ export default function SurveyModal({ isOpen, onClose, currentLang }: SurveyModa
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase">Kontakt telefon ili e-mail (opciono):</label>
+              <label className="text-xs font-bold text-slate-700 uppercase">{txt("Kontakt telefon ili e-mail (opciono):")}</label>
               <input
                 type="text"
                 value={contact}

@@ -5,7 +5,12 @@ import { initialTenders } from "@/lib/tendersData";
 import { Search, FileText, Download, ShieldCheck, ArrowLeft, Filter, Calendar } from "lucide-react";
 import Link from "next/link";
 
+import { useLanguage } from "@/context/LanguageContext";
+import { tr } from "@/lib/translations";
+
 export default function JavneNabavkePage() {
+  const { currentLang } = useLanguage();
+  const txt = (s: string) => tr(s, currentLang);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
@@ -51,13 +56,13 @@ export default function JavneNabavkePage() {
               className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition flex items-center gap-2 text-xs font-bold uppercase tracking-wider"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Nazad na portal</span>
+              <span>{txt("Nazad na portal")}</span>
             </Link>
 
             <div className="border-l border-slate-700 pl-4">
               <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
                 <ShieldCheck className="w-6 h-6 text-sky-400" />
-                <span>Registar javnih nabavki i akata</span>
+                <span>{txt("Registar javnih nabavki i akata")}</span>
               </h1>
               <p className="text-xs text-slate-400 font-medium">
                 JP „AQUANA“ d.o.o. Banja Luka • Službena zakonska evidencija
@@ -66,7 +71,7 @@ export default function JavneNabavkePage() {
           </div>
 
           <div className="text-right text-xs text-slate-400 hidden sm:block">
-            <span className="block text-slate-200 font-bold">Zakon o javnim nabavkama BiH</span>
+            <span className="block text-slate-200 font-bold">{txt("Zakon o javnim nabavkama BiH")}</span>
             <span>Ažurirano: {new Date().toLocaleDateString('sr-BA')}</span>
           </div>
         </div>
@@ -83,7 +88,7 @@ export default function JavneNabavkePage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Pretraži po nazivu, predmetu ili datumu..."
+              placeholder={txt("Pretraži po nazivu, predmetu ili datumu...")}
               className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
@@ -125,8 +130,8 @@ export default function JavneNabavkePage() {
 
         {/* Count Bar */}
         <div className="flex items-center justify-between text-xs text-slate-600 font-semibold px-1">
-          <span>Prikazano: <strong className="text-slate-900">{filtered.length}</strong> dokumenata</span>
-          <span>Klikom na PDF preuzimate zvaničnu dokumentaciju</span>
+          <span>{txt("Prikazano:")} <strong className="text-slate-900">{filtered.length}</strong> dokumenata</span>
+          <span>{txt("Klikom na PDF preuzimate zvaničnu dokumentaciju")}</span>
         </div>
 
         {/* High-Contrast, Clean, Highly Legible Table */}
@@ -153,7 +158,7 @@ export default function JavneNabavkePage() {
                         <div className="flex items-start gap-3">
                           <FileText className="w-5 h-5 text-sky-700 shrink-0 mt-0.5" />
                           <span className="font-semibold text-slate-900 text-base leading-snug">
-                            {item.title}
+                            {txt(item.title)}
                           </span>
                         </div>
                       </td>
@@ -166,7 +171,7 @@ export default function JavneNabavkePage() {
                             item.status
                           )}`}
                         >
-                          {item.status}
+                          {txt(item.status)}
                         </span>
                       </td>
                       <td className="py-4 px-5 text-right">
@@ -179,7 +184,7 @@ export default function JavneNabavkePage() {
                             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition shadow-sm"
                           >
                             <Download className="w-3.5 h-3.5" />
-                            <span>Preuzmi PDF</span>
+                            <span>{txt("Preuzmi PDF")}</span>
                           </a>
                         ) : (
                           <span className="text-xs text-slate-400 italic">Arhiva</span>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Lang, translations, getSavedLang, saveLang, toCyrillic, tr } from "@/lib/translations";
@@ -385,7 +385,7 @@ export default function HomePage() {
                     <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider">
                       Ljetna Sezona
                     </span>
-                    <h3 className="text-2xl font-black">Otvoreni bazeni i sunčalište Borik</h3>
+                    <h3 className="text-2xl font-black">{txt("Otvoreni bazeni i sunčalište Borik")}</h3>
                   </div>
                 </div>
               </div>
@@ -404,10 +404,10 @@ export default function HomePage() {
                     <ShieldCheck className="w-6 h-6" />
                   </div>
                   <span className="text-xs font-bold text-sky-400 uppercase tracking-widest block">
-                    ZAKONSKA OBAVEZA BIH
+                    {txt("ZAKONSKA OBAVEZA BIH")}
                   </span>
                   <h3 className="text-2xl font-black tracking-tight text-white">
-                    Javne nabavke i tenderska evidencija
+                    {txt("Javne nabavke i tenderska evidencija")}
                   </h3>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     Službeni registar tenderskih postupaka, odluka o izboru najpovoljnijeg ponuđača, obavještenja o dodjeli ugovora i poništenja u skladu sa Zakonom o javnim nabavkama BiH.
@@ -429,10 +429,10 @@ export default function HomePage() {
                     <FileCheck2 className="w-6 h-6" />
                   </div>
                   <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest block">
-                    SLUŽBENA DOKUMENTACIJA
+                    {txt("SLUŽBENA DOKUMENTACIJA")}
                   </span>
                   <h3 className="text-2xl font-black tracking-tight text-white">
-                    Dokumenti, cjenovnici i nalazi vode
+                    {txt("Dokumenti, cjenovnici i nalazi vode")}
                   </h3>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     Zvanični cjenovnici GOB-a i Vodenog parka, redovni mikrobiološki i sanitarni nalazi Instituta za javno zdravstvo RS, identifikacija preduzeća (JIB, PIB) i pravilnici.
@@ -452,7 +452,7 @@ export default function HomePage() {
 
         
         {/* NAGRADNI KONKURS: NACRTAJ AQUANU ILI GOB (Karta od 10 ulaza) */}
-        <KidsContestBanner />
+        <KidsContestBanner currentLang={currentLang} />
 
         {/* 12. CITIZEN FEEDBACK / SURVEY BANNER */}
         <section className="w-full py-16 bg-gradient-to-r from-sky-800 via-sky-700 to-cyan-600 text-white shadow-inner">
@@ -477,7 +477,7 @@ export default function HomePage() {
       </main>
 
       {/* 12.5 GLAS POSJETILACA - ZID UTISAKA */}
-      <VisitorCommentsSection />
+      <VisitorCommentsSection currentLang={currentLang} />
 
       {/* 13. SOBER MODERN FOOTER */}
       <Footer currentLang={currentLang} />

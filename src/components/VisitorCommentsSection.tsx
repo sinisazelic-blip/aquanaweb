@@ -1,10 +1,19 @@
 "use client";
+import { Lang, tr } from "@/lib/translations";
+import { useLanguage } from "@/context/LanguageContext";
 
 import React, { useState, useEffect } from "react";
 import { MessageSquare, ThumbsUp, Send, CheckCircle2, Star, Sparkles, User, AlertCircle, Quote } from "lucide-react";
 import { getVisitorComments, saveVisitorComment, VisitorComment } from "@/lib/submissionsData";
 
-export default function VisitorCommentsSection() {
+interface VisitorCommentsSectionProps {
+  currentLang?: Lang;
+}
+
+export default function VisitorCommentsSection({ currentLang: propLang }: VisitorCommentsSectionProps) {
+  const langCtx = useLanguage();
+  const currentLang = propLang || langCtx.currentLang;
+  const txt = (s: string) => tr(s, currentLang);
   const [comments, setComments] = useState<VisitorComment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [author, setAuthor] = useState("");
@@ -63,10 +72,10 @@ export default function VisitorCommentsSection() {
               <span>Glas posjetilaca</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Zid utisaka & Prijedlozi građana
+              {txt("Zid utisaka & Prijedlozi građana")}
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
-              Vaše mišljenje nam je dragocjeno. Ovdje možete ostaviti pohvalu, prijedlog ili skrenuti pažnju upravi na stvari koje možemo poboljšati.
+              {txt("Vaše mišljenje nam je dragocjeno. Ovdje možete ostaviti pohvalu, prijedlog ili skrenuti pažnju upravi na stvari koje možemo poboljšati.")}
             </p>
           </div>
 
