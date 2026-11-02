@@ -1,7 +1,8 @@
 ﻿"use client";
 
-import React, { useState } from "react";
-import { Lang, translations } from "@/lib/translations";
+import React, { useState, useEffect } from "react";
+import { Lang, translations, getSavedLang, saveLang, toCyrillic } from "@/lib/translations";
+import { getPortalSettings, PortalSettings } from "@/lib/submissionsData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSlider from "@/components/HeroSlider";
@@ -41,6 +42,17 @@ import {
 
 export default function HomePage() {
   const [currentLang, setCurrentLang] = useState<Lang>("lat");
+  const [portalSettings, setPortalSettings] = useState<PortalSettings | null>(null);
+
+  useEffect(() => {
+    setCurrentLang(getSavedLang());
+    setPortalSettings(getPortalSettings());
+  }, []);
+
+  const handleLangChange = (l: Lang) => {
+    setCurrentLang(l);
+    saveLang(l);
+  };
   const [surveyOpen, setSurveyOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [fishGameOpen, setFishGameOpen] = useState(false);
@@ -68,7 +80,7 @@ export default function HomePage() {
       {/* 1. VIBRANT FULL-WIDTH HEADER */}
       <Header
         currentLang={currentLang}
-        setLang={setCurrentLang}
+        setLang={handleLangChange}
         onOpenSurvey={() => setSurveyOpen(true)} onOpenContact={() => setContactOpen(true)}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -117,11 +129,33 @@ export default function HomePage() {
         </div>
 
         {/* 4. TOP NEWS / JUST IN SPOTLIGHT */}
-        {topNews.isActive && (
+        {((portalSettings ? portalSettings.topBanner.isActive : topNews.isActive)) && (
           <TopNewsSpotlight
             currentLang={currentLang}
-            news={topNews}
-            onDismiss={() => setTopNews((prev) => ({ ...prev, isActive: false }))}
+            news={{
+              isActive: portalSettings ? portalSettings.topBanner.isActive : topNews.isActive,
+              type: "breaking",
+              title_lat: portalSettings ? portalSettings.topBanner.title : topNews.title_lat,
+              title_cir: portalSettings ? toCyrillic(portalSettings.topBanner.title) : topNews.title_cir,
+              title_en: topNews.title_en,
+              summary_lat: portalSettings ? portalSettings.topBanner.text : topNews.summary_lat,
+              summary_cir: portalSettings ? toCyrillic(portalSettings.topBanner.text) : topNews.summary_cir,
+              summary_en: topNews.summary_en,
+              linkText_lat: portalSettings ? portalSettings.topBanner.buttonText : "Pogledaj raspored",
+              linkText_cir: portalSettings ? toCyrillic(portalSettings.topBanner.buttonText) : "Погледај распоред",
+              linkText_en: "View Schedule",
+              linkUrl: portalSettings ? portalSettings.topBanner.buttonLink : "#raspored"
+            }}
+            onDismiss={() => {
+              if (portalSettings) {
+                setPortalSettings({
+                  ...portalSettings,
+                  topBanner: { ...portalSettings.topBanner, isActive: false }
+                });
+              } else {
+                setTopNews((prev) => ({ ...prev, isActive: false }));
+              }
+            }}
           />
         )}
 

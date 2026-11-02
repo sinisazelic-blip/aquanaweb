@@ -23,7 +23,9 @@ import {
   saveCoupon,
   getSpeedContestState,
   claimSpeedTicket,
-  SpeedContestState
+  SpeedContestState,
+  getPortalSettings,
+  PortalSettings
 } from "@/lib/submissionsData";
 
 interface FlashPromoActionProps {
@@ -34,8 +36,8 @@ export default function FlashPromoAction({ onOpenGame }: FlashPromoActionProps) 
   // Active promo mode: 'flash_coffee' or 'speed_waterpolo'
   const [activePromo, setActivePromo] = useState<"flash_coffee" | "speed_waterpolo">("flash_coffee");
 
-  // Countdown timer for flash action
-  const [timeLeft, setTimeLeft] = useState({ hours: 3, minutes: 48, seconds: 22 });
+  const [portalSettings, setPortalSettings] = useState<PortalSettings | null>(null);
+  const [timeLeft, setTimeLeft] = useState({ hours: 18, minutes: 0, seconds: 0 });
   
   // Speed contest state
   const [speedState, setSpeedState] = useState<SpeedContestState>({
@@ -57,20 +59,25 @@ export default function FlashPromoAction({ onOpenGame }: FlashPromoActionProps) 
   } | null>(null);
 
   useEffect(() => {
+    const settings = getPortalSettings();
+    setPortalSettings(settings);
     setSpeedState(getSpeedContestState());
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        }
-        return prev;
-      });
-    }, 1000);
+    const targetDate = settings?.flashPromo?.targetExpiry 
+      ? new Date(settings.flashPromo.targetExpiry).getTime()
+      : (Date.now() + 18 * 3600 * 1000);
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = Math.max(0, targetDate - now);
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setTimeLeft({ hours, minutes, seconds });
+    };
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -228,10 +235,10 @@ Dobrodošli u JP Aquana!
               {activePromo === "flash_coffee" ? (
                 <>
                   <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
-                    Uz sezonsku kartu od 50 ulazaka dobijate <span className="text-amber-400">5 besplatnih kafa</span> u Caffe Baru GOB!
+                    {portalSettings?.flashPromo?.title || "Uz sezonsku kartu od 50 ulazaka dobijate 5 besplatnih kafa u Caffe Baru GOB!"}
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    Aktivirajte akciju odmah na sajtu i preuzmite digitalni bar-kod kupon koji važi na biletarnici i u našem caffe baru.
+                    {portalSettings?.flashPromo?.description || "Aktivirajte akciju odmah na sajtu i preuzmite digitalni bar-kod kupon koji važi na biletarnici i u našem caffe baru."}
                   </p>
                 </>
               ) : (

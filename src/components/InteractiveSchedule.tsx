@@ -136,7 +136,7 @@ export default function InteractiveSchedule({ currentLang }: InteractiveSchedule
             // Find allocations in this time window
             // If item start <= slot.start and end >= slot.end
             const matchedInSlot = dayItems.filter((item: any) => {
-              return item.start <= slot.start && item.end >= slot.end;
+              return item.start < slot.end && item.end > slot.start;
             });
 
             // Map which lanes are taken by clubs
