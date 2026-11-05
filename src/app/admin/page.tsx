@@ -101,6 +101,28 @@ export default function AdminPortalPage() {
   const [commentsList, setCommentsList] = useState<VisitorComment[]>([]);
   const [inquiriesList, setInquiriesList] = useState<ContactInquiry[]>([]);
   const [receptionSearch, setReceptionSearch] = useState("");
+
+  const [telemetrySavedMsg, setTelemetrySavedMsg] = useState("");
+  const saveTelemetryToServer = async () => {
+    if (!portalSettings?.telemetry) return;
+    try {
+      const res = await fetch("/api-telemetry.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(portalSettings.telemetry)
+      });
+      if (res.ok) {
+        setTelemetrySavedMsg("? Temperature su uspje?no sa?uvane na serveru i odmah vidljive svim posjetiocima!");
+        setTimeout(() => setTelemetrySavedMsg(""), 4000);
+      } else {
+        setTelemetrySavedMsg("Gre?ka pri ?uvanju na serveru.");
+      }
+    } catch {
+      setTelemetrySavedMsg("? Sa?uvano lokalno (server trenutno nedostupan).");
+      setTimeout(() => setTelemetrySavedMsg(""), 3000);
+    }
+  };
+
   const [portalSettings, setPortalSettings] = useState<PortalSettings | null>(null);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 

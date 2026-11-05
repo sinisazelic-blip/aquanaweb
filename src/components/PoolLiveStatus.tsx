@@ -14,7 +14,23 @@ interface PoolLiveStatusProps {
 export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
   const [activeRadar, setActiveRadar] = useState<"gob" | "vp">("gob");
   const [portalSettings, setPortalSettings] = useState<PortalSettings | null>(null);
-  useEffect(() => { setPortalSettings(getPortalSettings()); }, []);
+  useEffect(() => {
+    setPortalSettings(getPortalSettings());
+    fetch("/api-telemetry.php")
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.waterTemp) {
+          setPortalSettings(prev => ({
+            ...(prev || getPortalSettings()),
+            telemetry: {
+              ...(prev?.telemetry || getPortalSettings().telemetry),
+              ...data
+            }
+          }));
+        }
+      })
+      .catch(() => {});
+  }, []);
   const waterTemp = portalSettings?.telemetry?.waterTemp || "26.8";
   const airTemp = portalSettings?.telemetry?.airTemp || "28.5";
   const waterStatus = portalSettings?.telemetry?.waterStatus || "FINA takmičarska norma";

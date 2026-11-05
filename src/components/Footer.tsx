@@ -114,11 +114,7 @@ export default function Footer({ currentLang: propLang }: { currentLang?: Lang }
                 <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
                 <span>Javne nabavke (Tenderi)</span>
               </Link>
-              <a href="#portal" className="flex items-center gap-1.5 hover:text-cyan-300 transition text-sky-400 font-bold pt-2">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>B2B Portal za klubove</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+              
             </div>
           </div>
         </div>

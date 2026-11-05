@@ -126,43 +126,38 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
         </Link>
 
         <nav className="hidden xl:flex items-center gap-5 font-bold text-xs tracking-wider text-slate-800 uppercase">
-          <Link href="/gob" className="hover:text-sky-600 transition flex items-center gap-1">
+          <Link href="/gob" className="hover:text-sky-600 transition flex items-center gap-1.5">
             {t.nav.gob}
           </Link>
-          <Link href="/vodeni-park" className="hover:text-sky-600 transition flex items-center gap-1">
+          <Link href="/vodeni-park" className="hover:text-sky-600 transition flex items-center gap-1.5">
             {t.nav.aquana}
           </Link>
-          <Link href="/cjenovnik" className="hover:text-sky-600 transition flex items-center gap-1">
+          <Link href="/cjenovnik" className="hover:text-sky-600 transition flex items-center gap-1.5">
             <Tag className="w-3.5 h-3.5 text-amber-500" />
             <span>{t.nav.pricing}</span>
           </Link>
-          <Link href="/vijesti" className="hover:text-sky-600 transition flex items-center gap-1">
+          <Link href="/vijesti" className="hover:text-sky-600 transition flex items-center gap-1.5">
             <Newspaper className="w-3.5 h-3.5 text-sky-500" />
             <span>{t.nav.news}</span>
           </Link>
-          <Link
-            href="/dokumenti"
-            className="text-slate-700 hover:text-cyan-700 font-extrabold flex items-center gap-1 bg-slate-50 hover:bg-cyan-50 px-3 py-1.5 rounded-xl border border-slate-200 transition"
-          >
+          <Link href="/dokumenti" className="hover:text-sky-600 transition flex items-center gap-1.5">
             <FileText className="w-3.5 h-3.5 text-cyan-600" />
             <span>{t.nav.documents}</span>
           </Link>
-          <Link
-            href="/javne-nabavke"
-            className="text-sky-800 hover:text-sky-950 font-extrabold flex items-center gap-1 bg-sky-50 px-3 py-1.5 rounded-xl border border-sky-200 transition"
-          >
+          <Link href="/javne-nabavke" className="hover:text-sky-600 transition flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-sky-600" />
             <span>{t.nav.tenders}</span>
           </Link>
           <button
             onClick={onOpenSurvey}
-            className="text-amber-600 hover:text-amber-700 font-extrabold flex items-center gap-1 tracking-wide cursor-pointer"
+            className="hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer uppercase font-bold text-xs tracking-wider text-slate-800"
           >
-            ★ {t.nav.survey}
+            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            <span>{currentLang === "cir" ? "?????? ???????" : "ANKETA GRA?ANA"}</span>
           </button>
           <button
             onClick={onOpenContact}
-            className="hover:text-sky-600 transition font-bold uppercase cursor-pointer"
+            className="hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer uppercase font-bold text-xs tracking-wider text-slate-800"
           >
             {t.nav.contact}
           </button>
@@ -175,31 +170,31 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
             target="_blank"
             rel="noopener noreferrer"
             title="Portal za pliva?ke i vaterpolo klubove"
-            className="h-10 px-4 min-w-[96px] justify-center flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/60"
+            className="h-10 w-28 justify-center flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/60"
           >
             <Users className="w-3.5 h-3.5 text-blue-200" />
             <span>{currentLang === "cir" ? "????" : "Klub"}</span>
           </a>
 
-          {/* 2. B2B (Plavi tunel: b2b.aquana.ba - iste ?irine i boje kao Klub) */}
+          {/* 2. B2B (Plavi tunel: b2b.aquana.ba - IDENTI?NE ?IRINE, VISINE I BOJE KAO KLUB) */}
           <a
             href="https://b2b.aquana.ba"
             target="_blank"
             rel="noopener noreferrer"
             title="B2B portal za pravna lica i sindikalna kori?tenja"
-            className="h-10 px-4 min-w-[96px] justify-center flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/60"
+            className="h-10 w-28 justify-center flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/60"
           >
             <Building2 className="w-3.5 h-3.5 text-blue-200" />
             <span>B2B</span>
           </a>
 
-          {/* 3. WebShop / Karte (Narand?asto, ?ire dugme: shop.aquana.ba) */}
+          {/* 3. WebShop / Karte (Narand?asto, ?IRE dugme, IDENTI?NE VISINE h-10: shop.aquana.ba) */}
           <a
             href="https://karte.aquana.ba"
             target="_blank"
             rel="noopener noreferrer"
             title="Online kupovina karata i sezonskih propusnica"
-            className="h-10 px-6 min-w-[170px] justify-center flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-md shadow-orange-500/25 transition transform hover:scale-105 border border-amber-300/50"
+            className="h-10 w-44 justify-center flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-md shadow-orange-500/25 transition transform hover:scale-105 border border-amber-300/50"
           >
             <ShoppingCart className="w-4 h-4 text-slate-950 fill-current" />
             <span>{currentLang === "cir" ? "WebShop / ?????" : "WebShop / Karte"}</span>
@@ -332,7 +327,7 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-1.5 bg-sky-700 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-sm"
+                className="flex items-center justify-center gap-1.5 bg-blue-800 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-sm"
               >
                 <Users className="w-3.5 h-3.5" />
                 <span>{currentLang === "cir" ? "Клубови" : "Klubovi"}</span>
