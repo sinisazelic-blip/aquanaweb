@@ -7,7 +7,7 @@ import {
   FileText,
   Newspaper,
   Tag,
-  CheckCircle2,
+  CheckCircle2, Printer,
   Clock,
   AlertCircle,
   Plus,
@@ -399,6 +399,108 @@ export default function AdminPortalPage() {
       setTendersList(updated);
       saveStoredTenders(updated);
     }
+  };
+
+
+  // POS Thermal Printer Voucher Slip (58mm / 80mm format for Caffe Bar GOB)
+  const printPosReceipt = (coupon: CouponClaim) => {
+    if (typeof window === "undefined") return;
+    const isCoffee = coupon.facility.toLowerCase().includes("kafa") || coupon.code.startsWith("#AQ");
+    const printWindow = window.open("", "_blank", "width=380,height=600");
+    if (!printWindow) {
+      alert("Molimo omogu?ite pop-up prozore u browseru za POS ?tampu.");
+      return;
+    }
+    const receiptHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>POS Vau?er - ${coupon.code}</title>
+          <style>
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
+            body {
+              font-family: 'Courier New', Courier, monospace;
+              font-size: 13px;
+              line-height: 1.35;
+              width: 76mm;
+              margin: 0 auto;
+              padding: 10px 4px;
+              color: #000;
+              background: #fff;
+            }
+            .center { text-align: center; }
+            .bold { font-weight: bold; }
+            .large { font-size: 16px; }
+            .xlarge { font-size: 20px; letter-spacing: 1px; }
+            .divider { border-top: 1px dashed #000; margin: 8px 0; }
+            .double-divider { border-top: 2px solid #000; margin: 8px 0; }
+            .box { border: 1.5px solid #000; padding: 6px; margin: 8px 0; text-align: center; }
+            .small { font-size: 11px; }
+          </style>
+        </head>
+        <body>
+          <div class="center bold large">JP "AQUANA" d.o.o.</div>
+          <div class="center bold">GRADSKI OLIMPIJSKI BAZEN</div>
+          <div class="center small">Banja Luka ? www.aquana.ba</div>
+          
+          <div class="double-divider"></div>
+          
+          <div class="center bold">DOKUMENT PRAVDANJA ?ANKA</div>
+          <div class="center small">SLIP ZA CAFFE BAR GOB</div>
+          
+          <div class="divider"></div>
+          
+          <div><strong>DATUM:</strong> ${new Date().toLocaleDateString("sr-RS")} ${new Date().toLocaleTimeString("sr-RS")}</div>
+          <div><strong>KORISNIK:</strong> ${coupon.phone}</div>
+          <div><strong>OPERATER:</strong> Recepcija / Biletarnica GOB</div>
+          
+          <div class="box">
+            <div class="small bold">JEDINSTVENI KOD KUPONA:</div>
+            <div class="bold xlarge">${coupon.code}</div>
+            <div class="small">${coupon.status === "Iskori?ten" ? "STATUS: ISKORI?TEN / VERIFIKOVAN" : "STATUS: EVIDENTIRAN"}</div>
+          </div>
+          
+          <div class="bold">POGODNOST:</div>
+          <div>${coupon.facility}</div>
+          
+          <div class="divider"></div>
+          
+          <div class="small bold">PRAVDANJE I OBRA?UN:</div>
+          <div class="small">
+            ${isCoffee 
+              ? "Ovaj slip daje pravo donosiocu na besplatnu kafu u Caffe baru GOB. ?anker / konobar zadr?ava slip i prila?e ga uz dnevni fiskalni obra?un."
+              : "Validirana besplatna ulaznica za posjetioca. Zadr?ava kontrola ulaza / biletarnica."}
+          </div>
+          
+          <div class="double-divider"></div>
+          
+          <div class="center bold small">HVALA NA POVJERENJU!</div>
+          <div class="center small">Sistem za digitalne kupone GOB</div>
+          
+          <script>
+            window.onload = function() {
+              window.focus();
+              window.print();
+              setTimeout(function() { window.close(); }, 800);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+    printWindow.document.open();
+    printWindow.document.write(receiptHtml);
+    printWindow.document.close();
+  };
+
+  const handleRedeemAndPrint = (coupon: CouponClaim) => {
+    if (coupon.status === "Aktivan") {
+      toggleCouponStatus(coupon.id);
+    }
+    printPosReceipt(coupon);
   };
 
   // Coupon toggle status
@@ -909,24 +1011,37 @@ export default function AdminPortalPage() {
                               ● {c.status === "Aktivan" ? "Čeka preuzimanje" : "Iskorišten"}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-right">
-                            {c.status === "Aktivan" ? (
-                              <button
-                                onClick={() => toggleCouponStatus(c.id)}
-                                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-emerald-600/30 transition hover:scale-105 inline-flex items-center gap-1.5 cursor-pointer"
-                              >
-                                <CheckCircle2 className="w-4 h-4" />
-                                <span>Izdaj vaučer / Potvrdi</span>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => toggleCouponStatus(c.id)}
-                                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] transition cursor-pointer"
-                                title="Poništi status ako je greškom označeno"
-                              >
-                                Poništi iskorištenje
-                              </button>
-                            )}
+                                                    <td className="py-3.5 px-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {c.status === "Aktivan" ? (
+                                <button
+                                  onClick={() => handleRedeemAndPrint(c)}
+                                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-emerald-600/30 transition hover:scale-105 inline-flex items-center gap-1.5 cursor-pointer"
+                                  title="Ozna?i kupon kao iskori?ten i od?tampaj POS slip za Caffe bar GOB"
+                                >
+                                  <Printer className="w-4 h-4" />
+                                  <span>Izdaj & ?tampaj POS ra?un</span>
+                                </button>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => printPosReceipt(c)}
+                                    className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs shadow transition hover:scale-105 inline-flex items-center gap-1.5 cursor-pointer"
+                                    title="Ponovo od?tampaj POS slip za ?ank"
+                                  >
+                                    <Printer className="w-3.5 h-3.5 text-amber-400" />
+                                    <span>?tampaj slip</span>
+                                  </button>
+                                  <button
+                                    onClick={() => toggleCouponStatus(c.id)}
+                                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] transition cursor-pointer"
+                                    title="Poni?ti status ako je gre?kom ozna?eno"
+                                  >
+                                    Poni?ti
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );

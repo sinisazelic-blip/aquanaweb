@@ -19,6 +19,7 @@ import ContactModal from "@/components/ContactModal";
 import VisitorCommentsSection from "@/components/VisitorCommentsSection";
 
 import Link from "next/link";
+import SmartPhoneButton from "@/components/SmartPhoneButton";
 import {
   Waves,
   Sun,

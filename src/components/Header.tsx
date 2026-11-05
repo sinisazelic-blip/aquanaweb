@@ -174,35 +174,35 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
             href="https://klubovi.aquana.ba"
             target="_blank"
             rel="noopener noreferrer"
-            title="Portal za plivačke i vaterpolo klubove"
-            className="flex items-center gap-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition hover:scale-105"
+            title="Portal za pliva?ke i vaterpolo klubove"
+            className="h-10 px-4 min-w-[96px] justify-center flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/60"
           >
-            <Users className="w-3.5 h-3.5 text-sky-200" />
-            <span>{currentLang === "cir" ? "Клубови" : "Klubovi"}</span>
+            <Users className="w-3.5 h-3.5 text-blue-200" />
+            <span>{currentLang === "cir" ? "????" : "Klub"}</span>
           </a>
 
-          {/* 2. B2B (Plavi tunel: b2b.aquana.ba) */}
+          {/* 2. B2B (Plavi tunel: b2b.aquana.ba - iste ?irine i boje kao Klub) */}
           <a
             href="https://b2b.aquana.ba"
             target="_blank"
             rel="noopener noreferrer"
-            title="B2B portal za pravna lica i sindikalna korištenja"
-            className="flex items-center gap-1.5 bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/50"
+            title="B2B portal za pravna lica i sindikalna kori?tenja"
+            className="h-10 px-4 min-w-[96px] justify-center flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/60"
           >
             <Building2 className="w-3.5 h-3.5 text-blue-200" />
             <span>B2B</span>
           </a>
 
-          {/* 3. WebShop / Karte (Narandžasto, veće dugme: shop.aquana.ba) */}
+          {/* 3. WebShop / Karte (Narand?asto, ?ire dugme: shop.aquana.ba) */}
           <a
             href="https://karte.aquana.ba"
             target="_blank"
             rel="noopener noreferrer"
             title="Online kupovina karata i sezonskih propusnica"
-            className="flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md shadow-orange-500/25 transition transform hover:scale-105 border border-amber-300/50"
+            className="h-10 px-6 min-w-[170px] justify-center flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-md shadow-orange-500/25 transition transform hover:scale-105 border border-amber-300/50"
           >
             <ShoppingCart className="w-4 h-4 text-slate-950 fill-current" />
-            <span>{currentLang === "cir" ? "WebShop / Карте" : "WebShop / Karte"}</span>
+            <span>{currentLang === "cir" ? "WebShop / ?????" : "WebShop / Karte"}</span>
           </a>
         </div>
 

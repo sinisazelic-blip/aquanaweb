@@ -11,7 +11,7 @@ with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as z:
         for f in files:
             full = os.path.join(root, f)
             rel = os.path.relpath(full, out_dir)
-            if rel.startswith("dokumenti"):
+            if rel.startswith("dokumenti") and f.endswith(".pdf"):
                 continue
             z.write(full, rel)
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Lang, tr } from "@/lib/translations";
 import { ChevronLeft, ChevronRight, Waves, Sun, Award, ArrowRight, HeartHandshake, Droplet, Phone } from "lucide-react";
 import Link from "next/link";
+import SmartPhoneButton from "@/components/SmartPhoneButton";
 
 interface HeroSliderProps {
   currentLang: Lang;
@@ -150,13 +151,24 @@ export default function HeroSlider({ currentLang }: HeroSliderProps) {
 
           {/* Call to Actions */}
           <div className="flex flex-wrap items-center gap-4 pt-3">
-            <a
-              href={slide.ctaPrimaryLink}
-              className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-sky-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <span>{tr(slide.ctaPrimaryText, currentLang)}</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
+            {slide.ctaPrimaryLink.startsWith("tel:") ? (
+              <SmartPhoneButton
+                phoneNumber="065 72 50 50"
+                label={tr(slide.ctaPrimaryText, currentLang)}
+                className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-sky-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
+              >
+                <span>{tr(slide.ctaPrimaryText, currentLang)}</span>
+                <ArrowRight className="w-4 h-4" />
+              </SmartPhoneButton>
+            ) : (
+              <a
+                href={slide.ctaPrimaryLink}
+                className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-sky-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
+              >
+                <span>{tr(slide.ctaPrimaryText, currentLang)}</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            )}
 
             <a
               href={slide.ctaSecondaryLink}
