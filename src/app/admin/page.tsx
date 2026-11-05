@@ -483,7 +483,7 @@ export default function AdminPortalPage() {
           <div class="box">
             <div class="small bold">JEDINSTVENI KOD KUPONA:</div>
             <div class="bold xlarge">${coupon.code}</div>
-            <div class="small">${coupon.status === "Iskori?ten" ? "STATUS: ISKORI?TEN / VERIFIKOVAN" : "STATUS: EVIDENTIRAN"}</div>
+            <div class="small">${coupon.status === "Iskorišten" ? "STATUS: ISKORI?TEN / VERIFIKOVAN" : "STATUS: EVIDENTIRAN"}</div>
           </div>
           
           <div class="bold">POGODNOST:</div>
@@ -491,7 +491,7 @@ export default function AdminPortalPage() {
           
           <div class="divider"></div>
           
-          <div class="small bold">PRAVDANJE I OBRA?UN:</div>
+          <div class="small bold">PRAVDANJE I OBRAČUN:</div>
           <div class="small">
             ${isCoffee 
               ? "Ovaj slip daje pravo donosiocu na besplatnu kafu u Caffe baru GOB. ?anker / konobar zadr?ava slip i prila?e ga uz dnevni fiskalni obra?un."

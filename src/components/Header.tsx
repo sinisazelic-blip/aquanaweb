@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Lang, translations, saveLang } from "@/lib/translations";
 import { useLanguage } from "@/context/LanguageContext";
-import { Search, Menu, X, ShieldCheck, Phone, Facebook, Instagram, Youtube, FileText, Droplet, Tag, Newspaper, Mail, Users, Building2, ShoppingCart } from "lucide-react";
+import { Search, Menu, X, ShieldCheck, Phone, Facebook, Instagram, Youtube, FileText, Droplet, Tag, Newspaper, Mail, Star, Users, Building2, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
 interface HeaderProps {
@@ -125,7 +125,7 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
           />
         </Link>
 
-        <nav className="hidden xl:flex items-center gap-5 font-bold text-xs tracking-wider text-slate-800 uppercase">
+        <nav className="hidden xl:flex items-center gap-5 text-xs tracking-wider text-slate-800 uppercase font-semibold">
           <Link href="/gob" className="hover:text-sky-600 transition flex items-center gap-1.5">
             {t.nav.gob}
           </Link>
@@ -150,21 +150,21 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
           </Link>
           <button
             onClick={onOpenSurvey}
-            className="hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer uppercase font-bold text-xs tracking-wider text-slate-800"
+            className="hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer uppercase text-xs tracking-wider text-slate-800 font-semibold"
           >
             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            <span>{currentLang === "cir" ? "?????? ???????" : "ANKETA GRA?ANA"}</span>
+            <span>{currentLang === "cir" ? "АНКЕТА ГРАЂАНА" : "ANKETA GRAĐANA"}</span>
           </button>
           <button
             onClick={onOpenContact}
-            className="hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer uppercase font-bold text-xs tracking-wider text-slate-800"
+            className="hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer uppercase text-xs tracking-wider text-slate-800 font-semibold"
           >
             {t.nav.contact}
           </button>
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          {/* 1. Klub (Plavi tunel: klubovi.aquana.ba) */}
+          {/* 1. Klub (Plavi tunel: klubovi.aquana.ba - IDENTI?NE VISINE h-10 I ?IRINE w-28 KAO B2B) */}
           <a
             href="https://klubovi.aquana.ba"
             target="_blank"
@@ -173,10 +173,10 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
             className="h-10 w-28 justify-center flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-sm transition hover:scale-105 border border-blue-700/60"
           >
             <Users className="w-3.5 h-3.5 text-blue-200" />
-            <span>{currentLang === "cir" ? "????" : "Klub"}</span>
+            <span>{currentLang === "cir" ? "Клуб" : "Klub"}</span>
           </a>
 
-          {/* 2. B2B (Plavi tunel: b2b.aquana.ba - IDENTI?NE ?IRINE, VISINE I BOJE KAO KLUB) */}
+          {/* 2. B2B (Plavi tunel: b2b.aquana.ba - IDENTI?NE VISINE h-10 I ?IRINE w-28 KAO KLUB) */}
           <a
             href="https://b2b.aquana.ba"
             target="_blank"
@@ -188,7 +188,7 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
             <span>B2B</span>
           </a>
 
-          {/* 3. WebShop / Karte (Narand?asto, ?IRE dugme, IDENTI?NE VISINE h-10: shop.aquana.ba) */}
+          {/* 3. WebShop / Karte (Narand?asto, IDENTI?NE VISINE h-10, ?IRE w-44) */}
           <a
             href="https://karte.aquana.ba"
             target="_blank"
@@ -197,10 +197,9 @@ export default function Header({ currentLang: propLang, setLang: propSetLang, on
             className="h-10 w-44 justify-center flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-md shadow-orange-500/25 transition transform hover:scale-105 border border-amber-300/50"
           >
             <ShoppingCart className="w-4 h-4 text-slate-950 fill-current" />
-            <span>{currentLang === "cir" ? "WebShop / ?????" : "WebShop / Karte"}</span>
+            <span>{currentLang === "cir" ? "WebShop / Карте" : "WebShop / Karte"}</span>
           </a>
         </div>
-
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="xl:hidden p-2 text-slate-700 hover:text-sky-600 rounded-lg cursor-pointer"
