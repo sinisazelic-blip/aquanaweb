@@ -1,17 +1,35 @@
-# Apache configuration for Next.js static export
+# Apache configuration with Masking Rule
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # Serve static files and existing directories directly
+  # 1. Always allow deploy hook and telemetry API
+  RewriteRule ^api- - [L]
+  RewriteRule ^api/ - [L]
+
+  # 2. Secret unlock link: /novo runs novo.php
+  RewriteRule ^novo/?$ /novo.php [L]
+  RewriteRule ^lock/?$ /lock.php [L]
+
+  # 3. Always allow assets needed for u-izradi.html and APIs
+  RewriteRule ^u-izradi\.html$ - [L]
+  RewriteRule ^novo\.php$ - [L]
+  RewriteRule ^lock\.php$ - [L]
+  RewriteRule ^images/logo\.png$ - [L]
+  RewriteRule ^favicon\.ico$ - [L]
+
+  # 4. If cookie aquana_preview=1 is NOT set:
+  # Mask the entire site with u-izradi.html
+  RewriteCond %{HTTP_COOKIE} !aquana_preview=1
+  RewriteRule ^.*$ /u-izradi.html [L]
+
+  # 5. When unlocked (cookie present): Normal Next.js routing
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Allow access to index.html in directories
   DirectoryIndex index.html
 
-  # Fallback for dynamic subpaths
   RewriteCond %{REQUEST_FILENAME}.html -f
   RewriteRule ^(.*)$ $1.html [L]
 </IfModule>
