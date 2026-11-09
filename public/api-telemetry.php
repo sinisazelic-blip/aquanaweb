@@ -3,6 +3,8 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=utf-8");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
@@ -11,10 +13,9 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 
 $dataFile = __DIR__ . "/telemetry.json";
 
-// Default telemetry if not set
 $defaultTelemetry = [
-    "waterTemp" => "26.8",
-    "airTemp" => "28.5",
+    "waterTemp" => "26.0",
+    "airTemp" => "27.5",
     "waterStatus" => "FINA takmi?arska norma",
     "airStatus" => "Klimatizovana dvorana",
     "lastUpdated" => "Danas u 07:00h",

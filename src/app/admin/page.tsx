@@ -1913,6 +1913,27 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
               </div>
+
+              {/* SAVE BUTTON FOR SETTINGS TAB */}
+              <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-xs text-slate-500">
+                  Klikom na dugme podaci se trajno upisuju na server i postaju odmah vidljivi svim gra?anima i medijima.
+                </p>
+                <div className="flex items-center gap-3">
+                  {telemetrySavedMsg && (
+                    <span className="text-xs font-bold text-emerald-600 animate-in fade-in">
+                      {telemetrySavedMsg}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={saveTelemetryToServer}
+                    className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-cyan-600/30 transition hover:scale-105 flex items-center gap-2 cursor-pointer shrink-0"
+                  >
+                    <span>?? Upi?i / Sa?uvaj temperature</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -2226,6 +2247,7 @@ export default function AdminPortalPage() {
                 type="button"
                 onClick={() => {
                   savePortalSettings(portalSettings);
+                  saveTelemetryToServer();
                   setSettingsSuccess(true);
                   setTimeout(() => setSettingsSuccess(false), 4000);
                 }}

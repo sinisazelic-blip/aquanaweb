@@ -16,17 +16,20 @@ export default function PoolLiveStatus({ currentLang }: PoolLiveStatusProps) {
   const [portalSettings, setPortalSettings] = useState<PortalSettings | null>(null);
   useEffect(() => {
     setPortalSettings(getPortalSettings());
-    fetch("/api-telemetry.php")
+    fetch("/api-telemetry.php?_t=" + Date.now(), { cache: "no-store" })
       .then(r => r.json())
       .then(data => {
         if (data && data.waterTemp) {
-          setPortalSettings(prev => ({
-            ...(prev || getPortalSettings()),
-            telemetry: {
-              ...(prev?.telemetry || getPortalSettings().telemetry),
-              ...data
-            }
-          }));
+          setPortalSettings(prev => {
+            const base = prev || getPortalSettings();
+            return {
+              ...base,
+              telemetry: {
+                ...(base.telemetry || getPortalSettings().telemetry),
+                ...data
+              }
+            };
+          });
         }
       })
       .catch(() => {});
